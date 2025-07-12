@@ -1,0 +1,14 @@
+[versions]
+springBoot     = "3.5.3"
+springModulith = "1.4.1"
+
+[plugins]
+lombok               = { id = "io.freefair.lombok",              version = "8.14"  }
+dependencyManagement = { id = "io.spring.dependency-management", version = "1.1.7" }
+
+[libraries]
+springBootBom     = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot"     }
+springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version.ref = "springModulith" }
+jcef              = { module = "me.friwi:jcefmaven",                                version     = "135.0.20"       }
+springBootAutoconfigureProcessor = { module = "org.springframework.boot:spring-boot-autoconfigure-processor", version.ref = "springBoot" }
+springBootConfigurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "springBoot" }
