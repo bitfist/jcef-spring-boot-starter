@@ -55,5 +55,6 @@ gitHubRelease {
     projectName.set("JCEF Spring Boot Starter")
     projectDescription.set("Spring Boot Starter for JCEF")
     developer.set("bitfist")
+    licenseFile.set(projectDir.resolve("LICENSE.txt"))
 }
 
