@@ -1,0 +1,77 @@
+name: 'test'
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '.github/**'
+      - 'src/**'
+      - 'gradle/**'
+      - '*gradle*'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '.github/**'
+      - 'src/**'
+      - 'gradle/**'
+      - '*gradle*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Setup
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+      # Job
+      - name: Test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew test jacocoTestReport
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        env:
+          BADGES_FOLDER: .github/badges
+        with:
+          generate-branches-badge: true
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+      - name: Update badges (if changed)
+        env:
+          BADGES_FOLDER: .github/badges
+        run: |
+          if [[ `git status $BADGES_FOLDER --porcelain` ]]; then
+            git config --global user.name 'github_actions'
+            git config --global user.email '1898282+github-actions[bot]@users.noreply.github.com>'
+            git add $BADGES_FOLDER
+            git commit -m "update coverage badge"
+            git push
+          fi
+
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Setup
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+      # Job
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
