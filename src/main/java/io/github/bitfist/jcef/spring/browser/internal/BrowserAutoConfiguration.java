@@ -16,7 +16,7 @@ import java.util.Optional;
  * Imports BrowserConfiguration to set up browser startup and UI installation.
  */
 @Configuration
-@Import(CefConfiguration.class)
+@Import({BrowserStarter.class, CefConfiguration.class, UIInstaller.class})
 class BrowserAutoConfiguration {
 
     @Bean
