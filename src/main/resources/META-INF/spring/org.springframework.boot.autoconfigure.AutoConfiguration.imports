@@ -1,0 +1,5 @@
+io.github.bitfist.jcef.spring.JcefAutoConfiguration
+io.github.bitfist.jcef.spring.browser.internal.BrowserAutoConfiguration
+io.github.bitfist.jcef.spring.javascript.internal.JavaScriptExecutionAutoConfiguration
+io.github.bitfist.jcef.spring.debug.internal.DebugAutoConfiguration
+
