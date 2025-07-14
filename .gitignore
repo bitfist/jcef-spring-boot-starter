@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### other stuff ###
-scripts/context.txt
+context.txt

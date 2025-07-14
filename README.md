@@ -1,41 +1,12 @@
-[![Gradle build](https://github.com/bitfist/jcef-spring-boot-starter/actions/workflows/test.yml/badge.svg)](https://github.com/bitfist/os-conditions-spring-boot-starter/actions/workflows/test.yml)
-![Coverage](.github/badges/jacoco.svg)
-![Branches](.github/badges/branches.svg)
+# JCEF Spring Boot Integration
 
-🚀 **JCEF Spring Boot Integration**
+Start with examples on how to use the API, especially the annotations and the customizers.
 
-*A Spring Boot starter for embedding a Chromium browser (via JCEF) in desktop applications.*
+## 🔍 Examples
 
----
-
-## ⚙️ Quick Start
-
-### 1. 📦 Add Dependency
-
-```xml
-<dependency>
-  <groupId>io.github.bitfist</groupId>
-  <artifactId>jcef-spring-boot-starter</artifactId>
-  <version>REPLACE_WITH_VERSION</version>
-</dependency>
-```
-
-### 2. 🛠 Configure Application Properties
-
-```yaml
-jcef:
-  application-name: MyApp            # (required)
-  splash-screen-classpath-resource: splash.png
-  distribution-classpath: ui         # defaults to "ui"
-  development-options:
-    debug-port: 9222                # optional: remote debugging port
-    show-developer-tools: true      # optional: opens DevTools on load end
-```
-
-### 3. 🚀 Bootstrap the Application
+### 🚀 Basic Application Bootstrap
 
 ```java
-@SpringBootApplication
 public class MyApp {
     public static void main(String[] args) {
         JcefApplication.run(MyApp.class, args);
@@ -43,204 +14,98 @@ public class MyApp {
 }
 ```
 
-Customize the SpringApplicationBuilder:
+### ✍️ Executing JavaScript via Annotation
 
 ```java
-JcefApplication.run(MyApp.class, args, builder -> {
-    builder.profiles("desktop");
-});
+public interface MyScripts {
+    @JavaScriptCode("alert('Hello, :name');")
+    void greet(String name);
+}
 ```
 
----
-
-## 📚 Public API
-
-All packages under `io.github.bitfist.jcef.spring` are organized into modules. Every direct child of a module is part of the public API.
-
-### 🏗 Core Auto-Configuration
-
-* **`JcefAutoConfiguration`**
-
-    * Enables all JCEF Spring Boot beans.
-    * Activates binding of `JcefApplicationProperties`.
-
----
-
-### 🖥️ Application Module (`io.github.bitfist.jcef.spring.application`)
-
-#### `JcefApplication`
-
-* Utility class to launch a desktop Spring Boot app with non-headless mode.
-* Methods:
-
-    * `run(Class<T> clazz, String[] args)` – basic startup with native look‑and‑feel.
-    * `run(Class<T> clazz, String[] args, Consumer<SpringApplicationBuilder> customizer)` – tweak builder before run.
-
-#### `JcefApplicationProperties`
-
-* Maps properties prefixed `jcef`.
-
-* Required: `application-name` (must not be blank).
-
-* Optional: `splash-screen-classpath-resource`, `distribution-classpath` (default `ui`).
-
-* `DevelopmentOptions` record holds `debugPort` and `showDeveloperTools`.
-
-* Runtime path methods (platform‑aware):
-
-    * `getInstallationPath()` – base app data dir.
-    * `getJcefInstallationPath()` – JCEF binaries folder.
-    * `getUiInstallationPath()` – UI resource folder.
-
----
-
-### 🌐 Browser Module (`io.github.bitfist.jcef.spring.browser`)
-
-#### `AbstractSplashScreen`
-
-* Abstract `JFrame` implementing `IProgressHandler`.
-* Extend to provide custom installation progress UI.
-
-#### Customizer Interfaces (functional)
-
-* **`CefApplicationCustomizer`** – configure `CefAppBuilder` before build.
-* **`CefClientCustomizer`** – customize `CefClient` (routers, handlers).
-* **`CefBrowserCustomizer`** – post‑creation hook on `CefBrowser`.
-* **`CefBrowserFrameCustomizer`** – adjust the hosting `JFrame` (size, events).
-
-#### Internal Auto-Configuration
-
-* **`BrowserConfiguration`**, **`CefConfiguration`** provide default beans:
-
-    * Default splash screen, query router, JSON mapper.
-    * `BrowserStarter` launches the browser on `ApplicationReadyEvent`.
-    * `UIInstaller` syncs UI files from classpath to install dir.
-
----
-
-### 💻 Code Execution Module (`io.github.bitfist.jcef.spring.javascript.execution`)
-
-#### `@Code` Annotation
-
-* Annotate interface methods with JavaScript snippets to execute in browser.
-* Syntax: `@Code("console.log('Hi :param');")`.
-
-#### `JavaScriptExecutor` Interface
-
-* Defines `execute(String code)`.
-
-#### `DefaultJavaScriptExecutor`
-
-* Default bean executing code via `cefBrowser.executeJavaScript(code, null, 0)`.
-
----
-
-### 🔧 Code Generation Module (`io.github.bitfist.jcef.spring.javascript.generation`)
-
-#### `@TypeScript` Annotation
-
-* Apply to classes (`@CefQueryHandler` beans) to trigger TS stub generation.
-* Attribute: `packageName()` for output directory.
-
-#### Annotation Processor Components
-
-* **`ModelScanner`** discovers handler classes and DTOs.
-* **`HeaderRenderer`, `InterfaceRenderer`, `MethodRenderer`, `ClassRenderer`** compose TS files.
-* **`TsFileWriter`** writes `.ts` to configured output path.
-* **`ResourceCopier`** adds helper assets (`CefQueryService.ts`, `cef.d.ts`).
-
----
-
-### 🐞 Debug Module (`io.github.bitfist.jcef.spring.debug`)
-
-* **Developer Tools**: if `jcef.development-options.show-developer-tools=true`, opens DevTools on load finish.
-* **Remote Debug**: if `jcef.development-options.debug-port` is set, configures `--remote-debugging-port` and allows origins.
-
----
-
-### 🔍 Query Module (`io.github.bitfist.jcef.spring.query`)
-
-#### `@CefQueryHandler`
-
-* Annotate classes or methods to handle `window.cefQuery({route, payload})` calls.
-* Supports path variables (`/api/{id}`) – compiled with `-parameters`.
-
-#### `CefQueryJson`
-
-* POJO holding `route` and `payload` data.
-
-#### `CefQueryEvent`
-
-* Spring event published on each incoming query.
-
-#### `CefQueryException`
-
-* Throw to respond with a specific error code and message.
-
-#### `DefaultCefQueryRouter`
-
-* Scans for handlers, builds regex routes, extracts path params and payload.
-* Deserializes payloads, invokes methods async, serializes responses.
-
----
-
-## 🛠 Annotation Processors
-
-### 🧩 CodeAnnotationProcessor
-
-* Processes `@Code` methods at compile time.
-* Generates `<InterfaceName>Impl` classes:
-
-    * Embeds JS snippet as `String` constant.
-    * Replaces placeholders with method args (primitives or JSON via Jackson).
-    * Delegates to `JavaScriptExecutor`.
-
-### ✍️ TypeScriptGeneratorProcessor
-
-* Activated if `jcef.output.type=typescript` and `jcef.output.path` is set.
-* Copies helper TS assets once per compilation.
-* Scans `@CefQueryHandler` beans and generates `.ts` stubs:
-
-    * Renders DTO interfaces for complex types.
-    * Emits static methods calling `CefQueryService.request<ReturnType>(route, body?, responseType)`.
-
-**Example Maven Configuration**
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-compiler-plugin</artifactId>
-  <configuration>
-    <annotationProcessorPaths>
-      <path>
-        <groupId>io.github.bitfist</groupId>
-        <artifactId>jcef-spring-boot-starter</artifactId>
-        <version>${project.version}</version>
-      </path>
-    </annotationProcessorPaths>
-    <compilerArgs>
-      <arg>-Ajcef.output.path=${project.build.directory}/generated-ts</arg>
-    </compilerArgs>
-  </configuration>
-</plugin>
-```
-
----
-
-## 📝 Example Usage
+### 🎨 Marking Beans for TypeScript Generation
 
 ```java
-@CefQueryHandler("/api")
-public class MyHandler {
-
-    @CefQueryHandler("/echo/{text}")
-    public String echo(String text) {
-        return text;
+@TypeScriptConfiguration(path = "app")
+@TypeScriptObject
+public class MyCallback {
+    public String echo(String message) {
+        return message;
     }
 }
-
-public interface MyJsApi {
-    @Code("console.log('Hello: :msg');")
-    void log(String msg);
-}
 ```
+
+## 📦 Public Modules
+
+All packages under `src/main/java/io/github/bitfist/jcef/spring/` are public API modules.
+
+### ⚙️ Application
+
+- **JcefApplication**
+  - `run(Class<T>, String[])`
+  - `run(Class<T>, String[], Consumer<SpringApplicationBuilder>)`
+- **JcefApplicationProperties**  
+  Binds `jcef.*` properties, validates configuration, and provides:
+  - Platform-specific installation paths (`getInstallationPath()`)
+  - JCEF bundle path (`getJcefInstallationPath()`)
+  - UI resources path (`getUiInstallationPath()`)
+
+### 🖥 Browser
+
+- **AbstractSplashScreen** 📦 Base frame for installation progress (implements `IProgressHandler`).
+- **Browser** 🖥 Interface to execute JavaScript: `executeJavaScript(String code)`.
+- **CefApplicationCustomizer** 🔧 Customize the `CefAppBuilder` before initialization.
+- **CefClientCustomizer** 🔧 Customize the `CefClient` (e.g., add message handlers).
+- **CefBrowserCustomizer** 🔧 Customize the `CefBrowser` instance.
+- **CefBrowserFrameCustomizer** 🔧 Customize the Swing `JFrame` hosting the browser.
+- **CefMessageHandler** 📣 Handle incoming CEF queries: `handleQuery(String)`.
+- **CefMessageException** 💥 Exception to signal query errors with code and message.
+
+### 🐞 Debug
+
+Autoconfiguration for debugging features:
+
+- `developerToolsCustomizer()` 🐞 Opens devtools on page load if `jcef.development-options.show-developer-tools=true`.
+- `debugPortCustomizer()` 🐞 Sets remote debugging port via `jcef.development-options.debug-port`.
+
+### ✍️ JSExecution
+
+- **@JavaScriptCode** ✍️ Annotate methods with JS snippets to generate execution code.
+- **JavaScriptExecutor** Interface; default implementation uses `Browser.executeJavaScript`.
+
+### 🎨 TSObject
+
+- **@TypeScriptConfiguration** 🎨 Configure TypeScript output path for generated files.
+- **@TypeScriptObject** 🎨 Mark Spring beans as callbacks accessible from JavaScript; triggers TS code generation.
+
+## 🚀 Getting Started
+
+Add the starter to your `pom.xml`:
+
+```xml
+<dependency>
+  <groupId>io.github.bitfist</groupId>
+  <artifactId>jcef-spring-boot-starter</artifactId>
+  <version>...</version>
+</dependency>
+```
+
+Enable annotation processing in your build.
+
+## ⚙️ Configuration
+
+Example `application.yml`:
+
+```yaml
+jcef:
+  application-name: my-app
+  splash-screen-classpath-resource: splash.png
+  distribution-classpath: ui
+  development-options:
+    show-developer-tools: true
+    debug-port: 9222
+```
+
+## 📄 License
+
+Apache License 2.0
