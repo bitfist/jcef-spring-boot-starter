@@ -1,6 +1,8 @@
 [versions]
 springBoot     = "3.5.3"
 springModulith = "1.4.1"
+compileTesting = "0.21.0"
+googleTruth    = "1.4.2"
 
 [plugins]
 lombok               = { id = "io.freefair.lombok",              version = "8.14"  }
@@ -12,3 +14,7 @@ springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom
 jcef              = { module = "me.friwi:jcefmaven",                                version     = "135.0.20"       }
 springBootAutoconfigureProcessor = { module = "org.springframework.boot:spring-boot-autoconfigure-processor", version.ref = "springBoot" }
 springBootConfigurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "springBoot" }
+# region Tests
+compileTesting = { module = "com.google.testing.compile:compile-testing", version.ref = "compileTesting" }
+googleTruth    = { module = "com.google.truth:truth",                     version.ref = "googleTruth"    }
+# endregion

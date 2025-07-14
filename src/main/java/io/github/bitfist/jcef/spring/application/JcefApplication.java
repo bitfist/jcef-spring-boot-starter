@@ -2,6 +2,7 @@ package io.github.bitfist.jcef.spring.application;
 
 import lombok.SneakyThrows;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+
 import javax.swing.UIManager;
 import java.util.function.Consumer;
 

@@ -27,6 +27,8 @@ dependencies {
     testImplementation(platform(libs.springModulithBom))
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.compileTesting)
+    testImplementation(libs.googleTruth)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     // endregion
 
@@ -49,6 +51,11 @@ tasks.withType(Javadoc::class.java).configureEach {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs(
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED"
+    )
 }
 
 gitHubRelease {

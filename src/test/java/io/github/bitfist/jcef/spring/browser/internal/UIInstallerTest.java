@@ -2,7 +2,6 @@ package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties.DevelopmentOptions;
-import io.github.bitfist.jcef.spring.browser.internal.UIInstaller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;

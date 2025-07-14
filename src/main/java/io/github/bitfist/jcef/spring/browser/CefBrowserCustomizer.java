@@ -1,6 +1,7 @@
 package io.github.bitfist.jcef.spring.browser;
 
 import org.cef.browser.CefBrowser;
+
 import java.util.function.Consumer;
 
 /**

@@ -7,11 +7,12 @@ export type ResponseType = 'auto' | 'string' | 'number' | 'boolean' | 'object';
 
 export class CefQueryService {
     static request<T>(
-        route: string,
-        payload: any,
+        className: string,
+        methodName: string,
+        parameters: any,
         responseType: ResponseType = 'auto'
     ): Promise<T> {
-        const request = JSON.stringify({ route, payload });
+        const request = JSON.stringify({ className, methodName, parameters });
         return new Promise((resolve, reject) => {
             window.cefQuery({
                 request,

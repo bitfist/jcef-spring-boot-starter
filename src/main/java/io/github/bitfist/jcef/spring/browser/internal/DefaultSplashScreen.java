@@ -1,10 +1,11 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
-import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
+import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
 import lombok.SneakyThrows;
 import me.friwi.jcefmaven.EnumProgress;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.lang.Nullable;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -29,7 +30,7 @@ class DefaultSplashScreen extends AbstractSplashScreen {
     private final JProgressBar progressBar;
     private final JLabel stateLabel;
 
-    public DefaultSplashScreen(JcefApplicationProperties applicationProperties, BuildProperties buildProperties) {
+    public DefaultSplashScreen(JcefApplicationProperties applicationProperties, @Nullable BuildProperties buildProperties) {
         super("Setup");
         setUndecorated(true);
 
@@ -45,7 +46,9 @@ class DefaultSplashScreen extends AbstractSplashScreen {
 
         // Frame layout
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(imagePanel == null ? new JPanel() : imagePanel, BorderLayout.CENTER);
+        if (imagePanel != null) {
+            getContentPane().add(imagePanel, BorderLayout.CENTER);
+        }
         getContentPane().add(bottom, BorderLayout.SOUTH);
 
         pack();
@@ -54,8 +57,11 @@ class DefaultSplashScreen extends AbstractSplashScreen {
     }
 
     @SneakyThrows
-    private JPanel getImagePanel(JcefApplicationProperties applicationProperties, BuildProperties buildProperties) {
+    private @Nullable JPanel getImagePanel(JcefApplicationProperties applicationProperties, @Nullable BuildProperties buildProperties) {
         String path = applicationProperties.getSplashScreenClasspathResource();
+        if (path == null) {
+            return null;
+        }
         URL imgUrl = getClass().getClassLoader().getResource(path);
         if (imgUrl == null) {
             return null;
@@ -99,7 +105,7 @@ class DefaultSplashScreen extends AbstractSplashScreen {
     }
 
     /**
-     * 🔄 Updates the progress bar and state label based on current installation state.
+     * 🔄 Updates the progress bar and state label based on the current installation state.
      *
      * @param state   Current progress stage (DOWNLOADING/EXTRACTING/etc).
      * @param percent Percentage completed for downloading (or -1 for indeterminate).

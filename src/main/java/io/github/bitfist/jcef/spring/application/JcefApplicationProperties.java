@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 import java.nio.file.Path;
@@ -21,11 +22,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class JcefApplicationProperties {
 
     private final String applicationName;
+    @Nullable
     private final String splashScreenClasspathResource;
+    @Nullable
     private final DevelopmentOptions developmentOptions;
     private String distributionClasspath;
 
-    public JcefApplicationProperties(String applicationName, String splashScreenClasspathResource, String distributionClasspath, DevelopmentOptions developmentOptions) {
+    public JcefApplicationProperties(String applicationName, @Nullable String splashScreenClasspathResource, @Nullable String distributionClasspath, @Nullable DevelopmentOptions developmentOptions) {
         if (isBlank(applicationName)) {
             throw new IllegalArgumentException("jcef.application-name name must not be blank");
         }

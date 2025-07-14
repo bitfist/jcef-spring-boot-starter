@@ -1,2 +1,2 @@
-io.github.bitfist.jcef.spring.browser.javascript.internal.JavaScriptCodeAnnotationProcessor
-io.github.bitfist.jcef.spring.query.internal.processor.TypeScriptGeneratorProcessor
+io.github.bitfist.jcef.spring.jsexecution.internal.JavaScriptCodeAnnotationProcessor
+io.github.bitfist.jcef.spring.tsobject.internal.processor.TypeScriptObjectProcessor

@@ -1,11 +1,11 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -20,7 +20,6 @@ import java.nio.file.StandardCopyOption;
  * Performs a full refresh if any resource is newer or missing.
  */
 @Slf4j
-@Component
 class UIInstaller {
 
     private final JcefApplicationProperties properties;
@@ -32,6 +31,10 @@ class UIInstaller {
      */
     public UIInstaller(JcefApplicationProperties properties) {
         this.properties = properties;
+    }
+
+    @PostConstruct
+    private void initialize() {
         installUIResources();
     }
 
