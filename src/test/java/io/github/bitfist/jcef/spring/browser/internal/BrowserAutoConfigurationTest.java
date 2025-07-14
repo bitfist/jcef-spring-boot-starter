@@ -17,6 +17,7 @@ import org.cef.browser.CefBrowser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -61,6 +62,7 @@ class BrowserAutoConfigurationTest {
 
         @Test
         @DisplayName("✅ should create DefaultSplashScreen with BuildProperties")
+        @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Needs Swing, cannot run in CI")
         void progressFrameProvider_withBuildProperties() {
             // Given
             BuildProperties mockBuildProperties = mock(BuildProperties.class);
@@ -76,6 +78,7 @@ class BrowserAutoConfigurationTest {
 
         @Test
         @DisplayName("✅ should create DefaultSplashScreen without BuildProperties")
+        @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Needs Swing, cannot run in CI")
         void progressFrameProvider_withoutBuildProperties() {
             // When
             AbstractSplashScreen splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.empty());
