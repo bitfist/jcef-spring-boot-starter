@@ -46,8 +46,8 @@ class UIInstallerTest {
     @Test
     @DisplayName("🔖  extractRelative strips prefix and leading slash")
     void whenExtractRelative_thenReturnsRelativePath() throws Exception {
-        JcefApplicationProperties props = new JcefApplicationProperties("app",  null, "ui", new DevelopmentOptions(null, false));
-        TestUIInstaller installer = new TestUIInstaller(props);
+        var props = new JcefApplicationProperties("app", null, "ui", new DevelopmentOptions(null, false));
+        var installer = new TestUIInstaller(props);
 
         Resource res = mock(Resource.class);
         when(res.getURL()).thenReturn(new URL("file:/opt/app/ui/css/style.css"));
@@ -63,8 +63,8 @@ class UIInstallerTest {
         Path tmp = Files.createTempDirectory("uitest");
         tmp.toFile().deleteOnExit();
 
-        JcefApplicationProperties props = new JcefApplicationProperties("app",  null, "ui", new DevelopmentOptions(null, false));
-        TestUIInstaller installer = new TestUIInstaller(props);
+        var props = new JcefApplicationProperties("app", null, "ui", new DevelopmentOptions(null, false));
+        var installer = new TestUIInstaller(props);
 
         assertTrue(installer.isEmptyDirectoryForTest(tmp));
     }

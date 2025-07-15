@@ -9,8 +9,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -43,9 +41,9 @@ class UIInstaller {
      */
     public void installUIResources() {
         try {
-            Path targetBase = properties.getUiInstallationPath();
-            String pattern = "classpath*:" + properties.getDistributionClasspath() + "/**/*";
-            Resource[] resources = resolver.getResources(pattern);
+            var targetBase = properties.getUiInstallationPath();
+            var pattern = "classpath*:" + properties.getDistributionClasspath() + "/**/*";
+            var resources = resolver.getResources(pattern);
 
             if (needsFullRefresh(resources, targetBase)) {
                 log.info("Detected updated UI resources; cleaning {}", targetBase);
@@ -71,12 +69,12 @@ class UIInstaller {
         if (!Files.exists(targetBase) || isEmptyDirectory(targetBase)) {
             return true;
         }
-        String prefix = "/" + properties.getDistributionClasspath() + "/";
+        var prefix = "/" + properties.getDistributionClasspath() + "/";
         for (Resource res : resources) {
             if (!res.isReadable() || res.getFilename() == null) continue;
-            String rel = extractRelative(res, prefix);
-            Path dest = targetBase.resolve(rel);
-            long srcTs = res.lastModified();
+            var rel = extractRelative(res, prefix);
+            var dest = targetBase.resolve(rel);
+            var srcTs = res.lastModified();
             long dstTs = Files.exists(dest)
                     ? Files.getLastModifiedTime(dest).toMillis()
                     : -1;
@@ -89,7 +87,7 @@ class UIInstaller {
 
     /** Returns true if the directory exists but has no files/subdirectories. */
     private boolean isEmptyDirectory(Path dir) throws IOException {
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
+        try (var ds = Files.newDirectoryStream(dir)) {
             return !ds.iterator().hasNext();
         }
     }
@@ -104,13 +102,13 @@ class UIInstaller {
 
     /** Copies all given resources into the target base, preserving structure. */
     private void copyAll(Resource[] resources, Path targetBase) throws IOException {
-        String prefix = "/" + properties.getDistributionClasspath() + "/";
+        var prefix = "/" + properties.getDistributionClasspath() + "/";
         for (Resource res : resources) {
             if (!res.isReadable() || res.getFilename() == null) continue;
-            String rel = extractRelative(res, prefix);
-            Path dest = targetBase.resolve(rel);
+            var rel = extractRelative(res, prefix);
+            var dest = targetBase.resolve(rel);
             Files.createDirectories(dest.getParent());
-            try (InputStream in = res.getInputStream()) {
+            try (var in = res.getInputStream()) {
                 Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
             }
             log.debug("Copied UI file: {}", dest);
@@ -122,8 +120,8 @@ class UIInstaller {
      * up to and including the prefix so we get "path/to/file".
      */
     private String extractRelative(Resource resource, String prefix) throws IOException {
-        String url = resource.getURL().toString();
-        int idx = url.indexOf(prefix);
+        var url = resource.getURL().toString();
+        var idx = url.indexOf(prefix);
         String rel = (idx >= 0)
                 ? url.substring(idx + prefix.length())
                 : resource.getFilename();

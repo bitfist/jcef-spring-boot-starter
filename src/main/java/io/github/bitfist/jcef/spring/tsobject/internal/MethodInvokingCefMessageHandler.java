@@ -27,7 +27,7 @@ class MethodInvokingCefMessageHandler {
      */
     @PostConstruct
     void initialize() {
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(TypeScriptObject.class);
+        var beans = applicationContext.getBeansWithAnnotation(TypeScriptObject.class);
         for (Object bean : beans.values()) {
             this.beans.put(bean.getClass().getName(), bean);
         }
@@ -41,9 +41,9 @@ class MethodInvokingCefMessageHandler {
      */
     @SneakyThrows
     Object handle(MethodInvokingCefMessage message) {
-        Object bean = findBean(message.getClassName());
-        Method method = findMethod(bean.getClass(), message.getMethodName(), message.getParameters());
-        Object[] arguments = prepareArguments(method, message.getParameters());
+        var bean = findBean(message.getClassName());
+        var method = findMethod(bean.getClass(), message.getMethodName(), message.getParameters());
+        var arguments = prepareArguments(method, message.getParameters());
         method.setAccessible(true);
         return method.invoke(bean, arguments);
     }
@@ -52,7 +52,7 @@ class MethodInvokingCefMessageHandler {
      * Finds a bean from the cache using its class name.
      */
     private Object findBean(String className) {
-        Object bean = beans.get(className);
+        var bean = beans.get(className);
         if (bean == null) {
             throw new SecurityException("Class '" + className + "' is not registered as a @JavaScriptObject.");
         }
@@ -82,13 +82,13 @@ class MethodInvokingCefMessageHandler {
             return new Object[0];
         }
 
-        Class<?>[] paramTypes = method.getParameterTypes();
+        var paramTypes = method.getParameterTypes();
         Object[] args = new Object[paramTypes.length];
-        java.lang.reflect.Parameter[] methodParameters = method.getParameters();
+        var methodParameters = method.getParameters();
 
-        for (int i = 0; i < paramTypes.length; i++) {
-            String paramName = methodParameters[i].getName();
-            Object paramValue = parameters.get(paramName);
+        for (var i = 0; i < paramTypes.length; i++) {
+            var paramName = methodParameters[i].getName();
+            var paramValue = parameters.get(paramName);
             Class<?> paramType = paramTypes[i];
 
             if (paramValue instanceof String && !paramType.equals(String.class) && isComplexType(paramType)) {

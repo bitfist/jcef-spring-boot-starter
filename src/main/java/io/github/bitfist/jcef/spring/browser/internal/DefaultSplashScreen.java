@@ -18,7 +18,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -34,13 +33,13 @@ class DefaultSplashScreen extends AbstractSplashScreen {
         super("Setup");
         setUndecorated(true);
 
-        JPanel imagePanel = getImagePanel(applicationProperties, buildProperties);
+        var imagePanel = getImagePanel(applicationProperties, buildProperties);
 
         // 4) State label and progress bar below the image
         stateLabel = new JLabel("");
         progressBar = new JProgressBar(0, 100);
 
-        JPanel bottom = new JPanel(new BorderLayout(5, 5));
+        var bottom = new JPanel(new BorderLayout(5, 5));
         bottom.add(stateLabel, BorderLayout.NORTH);
         bottom.add(progressBar, BorderLayout.SOUTH);
 
@@ -58,11 +57,11 @@ class DefaultSplashScreen extends AbstractSplashScreen {
 
     @SneakyThrows
     private @Nullable JPanel getImagePanel(JcefApplicationProperties applicationProperties, @Nullable BuildProperties buildProperties) {
-        String path = applicationProperties.getSplashScreenClasspathResource();
+        var path = applicationProperties.getSplashScreenClasspathResource();
         if (path == null) {
             return null;
         }
-        URL imgUrl = getClass().getClassLoader().getResource(path);
+        var imgUrl = getClass().getClassLoader().getResource(path);
         if (imgUrl == null) {
             return null;
         }
@@ -71,7 +70,7 @@ class DefaultSplashScreen extends AbstractSplashScreen {
         BufferedImage splashImage = ImageIO.read(imgUrl);
 
         // 2) Image panel with version overlay
-        JPanel imagePanel = new JPanel() {
+        var imagePanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -81,18 +80,18 @@ class DefaultSplashScreen extends AbstractSplashScreen {
             }
         };
         imagePanel.setLayout(new BorderLayout());
-        Dimension size = new Dimension(splashImage.getWidth(), splashImage.getHeight());
+        var size = new Dimension(splashImage.getWidth(), splashImage.getHeight());
         imagePanel.setMinimumSize(size);
         imagePanel.setPreferredSize(size);
 
         if (buildProperties != null && isNotBlank(buildProperties.getVersion()) && buildProperties.getTime() != null) {
             // 3) Version overlay in bottom‐right
-            String date = buildProperties.getTime().toString();
-            String version = buildProperties.getVersion();
-            JLabel versionLabel = new JLabel(version + " (" + date + ")");
+            var date = buildProperties.getTime().toString();
+            var version = buildProperties.getVersion();
+            var versionLabel = new JLabel(version + " (" + date + ")");
             versionLabel.setForeground(Color.WHITE);
 
-            JPanel overlay = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+            var overlay = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
             overlay.setOpaque(true);
             overlay.setBackground(new Color(0, 0, 0, 120));
             overlay.add(versionLabel);

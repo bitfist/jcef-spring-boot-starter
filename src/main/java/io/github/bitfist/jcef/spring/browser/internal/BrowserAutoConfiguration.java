@@ -23,7 +23,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +71,7 @@ class BrowserAutoConfiguration {
             AbstractSplashScreen splashScreen,
             List<CefApplicationCustomizer> cefApplicationCustomizers
     ) {
-        CefAppBuilder builder = new CefAppBuilder();
+        var builder = new CefAppBuilder();
         builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
         builder.setProgressHandler(splashScreen);
@@ -96,15 +95,15 @@ class BrowserAutoConfiguration {
 
     @Bean
     CefClient cefClient(CefApp cefApp, List<CefClientCustomizer> cefClientCustomizers) {
-        CefClient client = cefApp.createClient();
+        var client = cefApp.createClient();
         cefClientCustomizers.forEach(consumer -> consumer.accept(client));
         return client;
     }
 
     @Bean
     CefBrowser cefBrowser(CefClient client, List<CefBrowserCustomizer> cefBrowserCustomizers) {
-        File file = applicationProperties.getUiInstallationPath().resolve("index.html").toFile();
-        CefBrowser browser = client.createBrowser(file.toURI().toString(), false, false);
+        var file = applicationProperties.getUiInstallationPath().resolve("index.html").toFile();
+        var browser = client.createBrowser(file.toURI().toString(), false, false);
         cefBrowserCustomizers.forEach(consumer -> consumer.accept(browser));
         return browser;
     }

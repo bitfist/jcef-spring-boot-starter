@@ -52,11 +52,11 @@ class DefaultCefMessageRouterTest {
     @DisplayName("✅ Success Path - Should handle query successfully and call callback.success")
     void onQuery_whenHandlerSucceeds_shouldCallSuccess() throws CefMessageException {
         // Arrange: Define the expected successful result from the message handler.
-        String expectedResult = "{\"status\":\"success\",\"data\":\"some result\"}";
+        var expectedResult = "{\"status\":\"success\",\"data\":\"some result\"}";
         when(messageHandler.handleQuery(TEST_REQUEST)).thenReturn(expectedResult);
 
         // Act: Call the method under test.
-        boolean result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
+        var result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
 
         // Assert: Verify the interactions and the return value.
         // 1. Ensure the message handler was called with the correct request.
@@ -73,13 +73,13 @@ class DefaultCefMessageRouterTest {
     @DisplayName("❌ Exception Path - Should handle CefMessageException and call callback.failure")
     void onQuery_whenHandlerThrowsCefMessageException_shouldCallFailure() throws CefMessageException {
         // Arrange: Configure the message handler to throw a specific CefMessageException.
-        int errorCode = 404;
-        String errorMessage = "Resource not found";
-        CefMessageException cefException = new CefMessageException(errorCode, new Exception(errorMessage));
+        var errorCode = 404;
+        var errorMessage = "Resource not found";
+        var cefException = new CefMessageException(errorCode, new Exception(errorMessage));
         when(messageHandler.handleQuery(TEST_REQUEST)).thenThrow(cefException);
 
         // Act: Call the method under test.
-        boolean result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
+        var result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
 
         // Assert: Verify the error handling logic.
         // 1. Ensure the message handler was called.
@@ -96,12 +96,12 @@ class DefaultCefMessageRouterTest {
     @DisplayName("💥 Exception Path - Should handle unexpected Throwable and call callback.failure")
     void onQuery_whenHandlerThrowsUnexpectedException_shouldCallFailureWith500() throws CefMessageException {
         // Arrange: Configure the message handler to throw a generic, unexpected exception.
-        String errorMessage = "Something went terribly wrong!";
-        RuntimeException unexpectedException = new RuntimeException(errorMessage);
+        var errorMessage = "Something went terribly wrong!";
+        var unexpectedException = new RuntimeException(errorMessage);
         when(messageHandler.handleQuery(TEST_REQUEST)).thenThrow(unexpectedException);
 
         // Act: Call the method under test.
-        boolean result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
+        var result = cefMessageRouter.onQuery(browser, frame, QUERY_ID, TEST_REQUEST, PERSISTENT, callback);
 
         // Assert: Verify the generic error handling logic.
         // 1. Ensure the message handler was called.

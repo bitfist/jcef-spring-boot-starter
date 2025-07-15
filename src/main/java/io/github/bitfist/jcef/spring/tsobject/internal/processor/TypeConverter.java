@@ -27,12 +27,12 @@ class TypeConverter {
 
         // Handle Arrays
         if (typeMirror.getKind() == TypeKind.ARRAY) {
-            ArrayType arrayType = (ArrayType) typeMirror;
+            var arrayType = (ArrayType) typeMirror;
             return toTypeScript(arrayType.getComponentType()) + "[]";
         }
 
         // Handle boxed primitives and common types
-        String typeString = typeMirror.toString();
+        var typeString = typeMirror.toString();
         if (typeString.equals("java.lang.String")) return "string";
         if (typeString.equals("java.lang.Boolean")) return "boolean";
         if (typeString.matches("java\\.lang\\.(Byte|Short|Integer|Long|Float|Double)")) return "number";
@@ -40,7 +40,7 @@ class TypeConverter {
 
         // Handle Collections
         if (typeString.startsWith("java.util.List") || typeString.startsWith("java.util.Set")) {
-            DeclaredType declaredType = (DeclaredType) typeMirror;
+            var declaredType = (DeclaredType) typeMirror;
             if (declaredType.getTypeArguments().isEmpty()) {
                 return "any[]"; // Raw list/set
             }
@@ -49,10 +49,10 @@ class TypeConverter {
 
         // Handle Map
         if (typeString.startsWith("java.util.Map")) {
-            DeclaredType declaredType = (DeclaredType) typeMirror;
+            var declaredType = (DeclaredType) typeMirror;
             if (declaredType.getTypeArguments().size() == 2) {
-                String keyType = toTypeScript(declaredType.getTypeArguments().get(0));
-                String valueType = toTypeScript(declaredType.getTypeArguments().get(1));
+                var keyType = toTypeScript(declaredType.getTypeArguments().get(0));
+                var valueType = toTypeScript(declaredType.getTypeArguments().get(1));
                 return "{ [key: " + keyType + "]: " + valueType + " }";
             }
             return "{ [key: string]: any }"; // Raw map
@@ -67,7 +67,7 @@ class TypeConverter {
     }
 
     public String getCefResponseType(TypeMirror returnType) {
-        String tsType = toTypeScript(returnType);
+        var tsType = toTypeScript(returnType);
         return switch (tsType) {
             case "string" -> "string";
             case "boolean" -> "boolean";

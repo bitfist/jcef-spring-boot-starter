@@ -3,7 +3,6 @@ package io.github.bitfist.jcef.spring.application;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
@@ -45,8 +44,8 @@ public class JcefApplicationProperties {
         if (!this.distributionClasspath.endsWith("/")) {
             this.distributionClasspath += "/";
         }
-        String path = this.distributionClasspath + "index.html";
-        Resource indexHtml = new ClassPathResource(path);
+        var path = this.distributionClasspath + "index.html";
+        var indexHtml = new ClassPathResource(path);
         if (!indexHtml.exists()) {
             throw new IllegalArgumentException("Unable to locate index.html under classpath " + this.distributionClasspath);
         }
@@ -63,7 +62,7 @@ public class JcefApplicationProperties {
      */
     public Path getInstallationPath() {
         if (installationPath == null) {
-            String os = System.getProperty("os.name").toLowerCase();
+            var os = System.getProperty("os.name").toLowerCase();
             Path baseDir;
             if (os.contains("win")) {
                 baseDir = Path.of(System.getenv("APPDATA"));
@@ -104,6 +103,6 @@ public class JcefApplicationProperties {
 
     // endregion
 
-    public record DevelopmentOptions(Integer debugPort, boolean showDeveloperTools) {
+    public record DevelopmentOptions(@Nullable Integer debugPort, boolean showDeveloperTools) {
     }
 }

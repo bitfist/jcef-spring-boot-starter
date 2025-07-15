@@ -1,9 +1,7 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
-import io.github.bitfist.jcef.spring.browser.Browser;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
@@ -23,12 +21,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -68,7 +64,7 @@ class BrowserAutoConfigurationTest {
             BuildProperties mockBuildProperties = mock(BuildProperties.class);
 
             // When
-            AbstractSplashScreen splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.of(mockBuildProperties));
+            var splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.of(mockBuildProperties));
 
             // Then
             assertThat(splashScreen)
@@ -81,7 +77,7 @@ class BrowserAutoConfigurationTest {
         @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Needs Swing, cannot run in CI")
         void progressFrameProvider_withoutBuildProperties() {
             // When
-            AbstractSplashScreen splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.empty());
+            var splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.empty());
 
             // Then
             assertThat(splashScreen)
@@ -93,7 +89,7 @@ class BrowserAutoConfigurationTest {
         @DisplayName("✅ should create UIInstaller")
         void uiInstaller() {
             // When
-            UIInstaller uiInstaller = browserAutoConfiguration.uiInstaller(applicationProperties);
+            var uiInstaller = browserAutoConfiguration.uiInstaller(applicationProperties);
 
             // Then
             assertThat(uiInstaller).isNotNull();
@@ -108,7 +104,7 @@ class BrowserAutoConfigurationTest {
             List<CefBrowserFrameCustomizer> customizers = Collections.emptyList();
 
             // When
-            BrowserStarter browserStarter = browserAutoConfiguration.browserStarter(mockCefApp, mockCefBrowser, customizers);
+            var browserStarter = browserAutoConfiguration.browserStarter(mockCefApp, mockCefBrowser, customizers);
 
             // Then
             assertThat(browserStarter).isNotNull();
@@ -121,7 +117,7 @@ class BrowserAutoConfigurationTest {
             CefBrowser mockCefBrowser = mock(CefBrowser.class);
 
             // When
-            Browser browser = browserAutoConfiguration.browser(mockCefBrowser);
+            var browser = browserAutoConfiguration.browser(mockCefBrowser);
 
             // Then
             assertThat(browser)
@@ -133,7 +129,7 @@ class BrowserAutoConfigurationTest {
         @DisplayName("✅ should create ObjectMapper")
         void cefBrowserObjectMapper() {
             // When
-            ObjectMapper objectMapper = browserAutoConfiguration.cefBrowserObjectMapper();
+            var objectMapper = browserAutoConfiguration.cefBrowserObjectMapper();
 
             // Then
             assertThat(objectMapper).isNotNull();
@@ -161,24 +157,24 @@ class BrowserAutoConfigurationTest {
             when(applicationProperties.getJcefInstallationPath()).thenReturn(mockPath);
 
             CefApplicationCustomizer mockCustomizer = mock(CefApplicationCustomizer.class);
-            List<CefApplicationCustomizer> customizers = Collections.singletonList(mockCustomizer);
+            var customizers = Collections.singletonList(mockCustomizer);
             CefApp mockCefApp = mock(CefApp.class);
 
             // Mock the construction of CefAppBuilder
-            try (MockedConstruction<CefAppBuilder> mockedBuilder = mockConstruction(CefAppBuilder.class,
+            try (var mockedBuilder = mockConstruction(CefAppBuilder.class,
                     (mock, context) -> {
                         when(mock.build()).thenReturn(mockCefApp);
                         when(mock.getCefSettings()).thenReturn(new CefSettings());
                     })) {
 
                 // When
-                CefApp createdCefApp = browserAutoConfiguration.cefApp(mockApplicationContext, mockSplashScreen, customizers);
+                var createdCefApp = browserAutoConfiguration.cefApp(mockApplicationContext, mockSplashScreen, customizers);
 
                 // Then
                 assertThat(createdCefApp).isEqualTo(mockCefApp);
 
                 // Verify interactions with the mocked builder
-                CefAppBuilder builder = mockedBuilder.constructed().get(0);
+                var builder = mockedBuilder.constructed().get(0);
                 verify(builder).setInstallDir(mockPath.toFile());
                 verify(builder).setProgressHandler(mockSplashScreen);
                 verify(builder).setAppHandler(any(MavenCefAppHandlerAdapter.class));
@@ -195,7 +191,7 @@ class BrowserAutoConfigurationTest {
             when(applicationProperties.getJcefInstallationPath()).thenReturn(mockPath);
 
             // Mock the construction of CefAppBuilder to throw an exception
-            try (MockedConstruction<CefAppBuilder> mockedBuilder = mockConstruction(CefAppBuilder.class,
+            try (var mockedBuilder = mockConstruction(CefAppBuilder.class,
                     (mock, context) -> {
                         when(mock.build()).thenThrow(new InterruptedException("Build failed"));
                         when(mock.getCefSettings()).thenReturn(new CefSettings());
@@ -218,10 +214,10 @@ class BrowserAutoConfigurationTest {
             when(mockCefApp.createClient()).thenReturn(mockCefClient);
 
             CefClientCustomizer mockCustomizer = mock(CefClientCustomizer.class);
-            List<CefClientCustomizer> customizers = Collections.singletonList(mockCustomizer);
+            var customizers = Collections.singletonList(mockCustomizer);
 
             // When
-            CefClient createdClient = browserAutoConfiguration.cefClient(mockCefApp, customizers);
+            var createdClient = browserAutoConfiguration.cefClient(mockCefApp, customizers);
 
             // Then
             assertThat(createdClient).isEqualTo(mockCefClient);
@@ -236,16 +232,16 @@ class BrowserAutoConfigurationTest {
             CefClient mockCefClient = mock(CefClient.class);
             CefBrowser mockCefBrowser = mock(CefBrowser.class);
             Path mockUiPath = Paths.get("test/ui");
-            File expectedFile = mockUiPath.resolve("index.html").toFile();
+            var expectedFile = mockUiPath.resolve("index.html").toFile();
 
             when(applicationProperties.getUiInstallationPath()).thenReturn(mockUiPath);
             when(mockCefClient.createBrowser(anyString(), anyBoolean(), anyBoolean())).thenReturn(mockCefBrowser);
 
             CefBrowserCustomizer mockCustomizer = mock(CefBrowserCustomizer.class);
-            List<CefBrowserCustomizer> customizers = Collections.singletonList(mockCustomizer);
+            var customizers = Collections.singletonList(mockCustomizer);
 
             // When
-            CefBrowser createdBrowser = browserAutoConfiguration.cefBrowser(mockCefClient, customizers);
+            var createdBrowser = browserAutoConfiguration.cefBrowser(mockCefClient, customizers);
 
             // Then
             assertThat(createdBrowser).isEqualTo(mockCefBrowser);

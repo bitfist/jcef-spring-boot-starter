@@ -54,10 +54,10 @@ class TypeScriptObjectProcessorTest {
      * It combines the necessary annotation definitions with the provided test sources.
      */
     private Compilation compile(JavaFileObject... sources) {
-        String outputPathOption = "-Ajcef.output.path=" + temporaryOutputDirectory.toString();
+        var outputPathOption = "-Ajcef.output.path=" + temporaryOutputDirectory.toString();
 
         // Combine the mandatory annotations and the test-specific sources into one list.
-        List<JavaFileObject> allSources = new ArrayList<>();
+        var allSources = new ArrayList<JavaFileObject>();
         allSources.add(javaScriptConfigAnnotation);
         allSources.add(javaScriptObjectAnnotation);
         allSources.addAll(List.of(sources));
@@ -82,15 +82,15 @@ class TypeScriptObjectProcessorTest {
                 "}"
         );
 
-        Compilation compilation = compile(userService);
+        var compilation = compile(userService);
 
         assertThat(compilation).succeeded();
 
-        Path generatedFile = temporaryOutputDirectory.resolve("api/services/UserService.ts");
+        var generatedFile = temporaryOutputDirectory.resolve("api/services/UserService.ts");
         assertThat(Files.exists(generatedFile)).isTrue();
 
         String content = Files.readString(generatedFile);
-        String expectedContent = """
+        var expectedContent = """
                 import { CefQueryService } from '../../jcef/CefQueryService';
                 
                 export class UserService {
@@ -136,21 +136,21 @@ class TypeScriptObjectProcessorTest {
                 "}"
         );
 
-        Compilation compilation = compile(userDto, dataService);
+        var compilation = compile(userDto, dataService);
 
         assertThat(compilation).succeeded();
 
         // Assert the main service file
-        Path serviceFile = temporaryOutputDirectory.resolve("api/services/DataService.ts");
+        var serviceFile = temporaryOutputDirectory.resolve("api/services/DataService.ts");
         assertThat(Files.exists(serviceFile)).isTrue();
         String serviceContent = Files.readString(serviceFile);
         assertThat(serviceContent).contains("import type { UserDto } from '../model/UserDto';");
 
         // Assert the dependency file
-        Path dependencyFile = temporaryOutputDirectory.resolve("api/model/UserDto.ts");
+        var dependencyFile = temporaryOutputDirectory.resolve("api/model/UserDto.ts");
         assertThat(Files.exists(dependencyFile)).isTrue();
         String dependencyContent = Files.readString(dependencyFile);
-        String expectedDependencyContent = """
+        var expectedDependencyContent = """
                 export interface UserDto {
                     id: number;
                     username: string;
@@ -171,7 +171,7 @@ class TypeScriptObjectProcessorTest {
                 "}"
         );
 
-        Compilation compilation = compile(brokenService);
+        var compilation = compile(brokenService);
 
         // Assertions remain the same for compilation failures and errors
         assertThat(compilation).failed();
@@ -199,16 +199,16 @@ class TypeScriptObjectProcessorTest {
                 "}"
         );
 
-        Compilation compilation = compile(product, storeService);
+        var compilation = compile(product, storeService);
 
         assertThat(compilation).succeeded();
 
         // Assert the dependency was generated in a path derived from its Java package
-        Path dependencyFile = temporaryOutputDirectory.resolve("com/store/inventory/Product.ts");
+        var dependencyFile = temporaryOutputDirectory.resolve("com/store/inventory/Product.ts");
         assertThat(Files.exists(dependencyFile)).isTrue();
 
         String dependencyContent = Files.readString(dependencyFile);
-        String expectedDependencyContent = """
+        var expectedDependencyContent = """
                 export interface Product {
                     sku: string;
                 }
@@ -216,7 +216,7 @@ class TypeScriptObjectProcessorTest {
         assertThat(dependencyContent).isEqualTo(expectedDependencyContent);
 
         // Assert the main service has the correct relative import path to the dependency
-        Path serviceFile = temporaryOutputDirectory.resolve("store-front/api/StoreService.ts");
+        var serviceFile = temporaryOutputDirectory.resolve("store-front/api/StoreService.ts");
         assertThat(Files.exists(serviceFile)).isTrue();
         String serviceContent = Files.readString(serviceFile);
         assertThat(serviceContent).contains("""
@@ -253,7 +253,7 @@ class TypeScriptObjectProcessorTest {
 
         // --- ACT ---
         // Run the annotation processor
-        Compilation compilation = Compiler.javac()
+        var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions("-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath())
                 .compile(sourceFileWithMethod);
@@ -264,16 +264,16 @@ class TypeScriptObjectProcessorTest {
         assertThat(compilation).succeeded();
 
         // 2. Define the expected paths for the copied files.
-        Path cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
-        Path cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
+        var cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
+        var cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
 
         // 3. Assert that the files were created.
         assertTrue(Files.exists(cefQueryServicePath), "CefQueryService.ts should have been created.");
         assertTrue(Files.exists(cefDtsPath), "cef.d.ts should have been created.");
 
         // 4. Load the original content from test resources.
-        String expectedCefQueryServiceContent = getResourceContent("generator/templates/CefQueryService.ts");
-        String expectedCefDtsContent = getResourceContent("generator/templates/cef.d.ts");
+        var expectedCefQueryServiceContent = getResourceContent("generator/templates/CefQueryService.ts");
+        var expectedCefDtsContent = getResourceContent("generator/templates/cef.d.ts");
 
         // 5. Read the content of the newly created files.
         String actualCefQueryServiceContent = Files.readString(cefQueryServicePath);
@@ -299,7 +299,7 @@ class TypeScriptObjectProcessorTest {
 
         // --- ACT ---
         // Run the annotation processor
-        Compilation compilation = Compiler.javac()
+        var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions("-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath())
                 .compile(sourceFileWithoutMethod);
@@ -309,8 +309,8 @@ class TypeScriptObjectProcessorTest {
         assertThat(compilation).succeeded();
 
         // 2. Define the expected paths for the copied files.
-        Path cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
-        Path cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
+        var cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
+        var cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
 
         // 3. Assert that the files do NOT exist.
         assertFalse(Files.exists(cefQueryServicePath), "CefQueryService.ts should NOT have been created.");

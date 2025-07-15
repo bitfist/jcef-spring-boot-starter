@@ -25,10 +25,10 @@ class MethodInvokingCefQueryHandler implements CefMessageHandler {
             throw new CefMessageException(JSON_MESSAGE_PROCESSING_ERROR, jsonProcessingException);
         }
 
-        Object result = messageHandler.handle(message);
+        var result = messageHandler.handle(message);
 
         try {
-            Object convertedResult = serializeIfComplex(result);
+            var convertedResult = serializeIfComplex(result);
             return convertedResult == null ? null : convertedResult.toString();
         } catch (JsonProcessingException e) {
             throw new CefMessageException(JSON_RETURN_VALUE_PROCESSING_ERROR, e);

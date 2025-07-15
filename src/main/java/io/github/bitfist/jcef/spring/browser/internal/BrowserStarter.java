@@ -30,13 +30,13 @@ class BrowserStarter {
     @EventListener(ApplicationReadyEvent.class)
     void onReady() {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = createFrame(cefBrowser, cefApp);
+            var frame = createFrame(cefBrowser, cefApp);
             frame.setVisible(true);
         });
     }
 
     private JFrame createFrame(CefBrowser browser, CefApp cefApp) {
-        JFrame frame = new JFrame();
+        var frame = new JFrame();
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(browser.getUIComponent(), BorderLayout.CENTER);
         frame.setSize(1280, 800);

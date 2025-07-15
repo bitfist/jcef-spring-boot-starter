@@ -25,7 +25,7 @@ class DefaultCefMessageRouter extends CefMessageRouterHandlerAdapter {
     @Override
     public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
         try {
-            String result = messageHandler.handleQuery(request);
+            var result = messageHandler.handleQuery(request);
             callback.success(result);
             return true;
         } catch (CefMessageException exception) {

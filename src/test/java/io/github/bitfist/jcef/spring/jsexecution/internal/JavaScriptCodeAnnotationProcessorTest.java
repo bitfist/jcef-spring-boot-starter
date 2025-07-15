@@ -1,6 +1,5 @@
 package io.github.bitfist.jcef.spring.jsexecution.internal;
 
-import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +64,7 @@ class JavaScriptCodeAnnotationProcessorTest {
 
 
         // Compile the interface and run the annotation processor
-        Compilation compilation = javac()
+        var compilation = javac()
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(userInterface);
 
@@ -93,7 +92,7 @@ class JavaScriptCodeAnnotationProcessorTest {
                     }
                 """);
 
-        Compilation compilation = javac()
+        var compilation = javac()
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(userInterface);
 
@@ -124,7 +123,7 @@ class JavaScriptCodeAnnotationProcessorTest {
                     }
                 """);
 
-        Compilation compilation = javac()
+        var compilation = javac()
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(userInterface);
 
@@ -154,7 +153,7 @@ class JavaScriptCodeAnnotationProcessorTest {
                     }
                 """);
 
-        Compilation compilation = javac()
+        var compilation = javac()
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(invalidUsage);
 
@@ -176,7 +175,7 @@ class JavaScriptCodeAnnotationProcessorTest {
                     }
                 """);
 
-        Compilation compilation = javac()
+        var compilation = javac()
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(userInterface);
 

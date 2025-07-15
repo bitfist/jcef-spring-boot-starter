@@ -17,9 +17,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,22 +41,22 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Map<TypeElement, List<ExecutableElement>> interfacesAndMethods = new HashMap<>();
+        var interfacesAndMethods = new HashMap<TypeElement, List<ExecutableElement>>();
         for (Element e : roundEnv.getElementsAnnotatedWith(JavaScriptCode.class)) {
             if (e.getKind() != ElementKind.METHOD) continue;
-            ExecutableElement m = (ExecutableElement) e;
-            TypeElement iface = (TypeElement) m.getEnclosingElement();
+            var m = (ExecutableElement) e;
+            var iface = (TypeElement) m.getEnclosingElement();
             interfacesAndMethods.computeIfAbsent(iface, k -> new ArrayList<>()).add(m);
         }
 
         for (Map.Entry<TypeElement, List<ExecutableElement>> entry : interfacesAndMethods.entrySet()) {
-            TypeElement interfaceType = entry.getKey();
+            var interfaceType = entry.getKey();
             List<ExecutableElement> methods = entry.getValue();
-            String pkg = processingEnv.getElementUtils().getPackageOf(interfaceType).getQualifiedName().toString();
-            String interfaceName = interfaceType.getSimpleName().toString();
-            String className = interfaceName + "Impl";
+            var pkg = processingEnv.getElementUtils().getPackageOf(interfaceType).getQualifiedName().toString();
+            var interfaceName = interfaceType.getSimpleName().toString();
+            var className = interfaceName + "Impl";
 
-            StringBuilder buffer = new StringBuilder();
+            var buffer = new StringBuilder();
 
             generateClassCode(buffer, pkg, className, interfaceName);
             for (ExecutableElement method : methods) {
@@ -71,8 +69,8 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
             finishClass(buffer);
 
             try {
-                JavaFileObject file = filer.createSourceFile(pkg + "." + className);
-                Writer w = file.openWriter();
+                var file = filer.createSourceFile(pkg + "." + className);
+                var w = file.openWriter();
                 w.write(buffer.toString());
                 w.close();
             } catch (IOException ex) {
@@ -106,9 +104,9 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
     }
 
     private void generateMethodCode(ExecutableElement method, StringBuilder buffer) {
-        String methodName = method.getSimpleName().toString();
-        String code = method.getAnnotation(JavaScriptCode.class).value().replace("\"", "\\\"");
-        String codeField = methodName.toUpperCase() + "_CODE_" + generatedMethods;
+        var methodName = method.getSimpleName().toString();
+        var code = method.getAnnotation(JavaScriptCode.class).value().replace("\"", "\\\"");
+        var codeField = methodName.toUpperCase() + "_CODE_" + generatedMethods;
         generatedMethods++;
 
         buffer.append("    private static final String ").append(codeField)
@@ -118,8 +116,8 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
         buffer.append("    @Override\n");
         buffer.append("    public void ").append(methodName).append("(");
         List<? extends VariableElement> parameters = method.getParameters();
-        for (int i = 0; i < parameters.size(); i++) {
-            VariableElement p = parameters.get(i);
+        for (var i = 0; i < parameters.size(); i++) {
+            var p = parameters.get(i);
             buffer.append(p.asType().toString()).append(" ").append(p.getSimpleName().toString());
             if (i < parameters.size() - 1) {
                 buffer.append(", ");
@@ -132,7 +130,7 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
             buffer.append("        // region Variable replacements\n");
         }
         for (VariableElement parameter : parameters) {
-            String parameterName = parameter.getSimpleName().toString();
+            var parameterName = parameter.getSimpleName().toString();
             if (parameter.asType().getKind().isPrimitive()) {
                 buffer.append("        code = code.replace(\":").append(parameterName)
                         .append("\", String.valueOf(").append(parameterName).append("));\n");

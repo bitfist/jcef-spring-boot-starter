@@ -34,7 +34,7 @@ public abstract class JcefApplication {
     public static <T> void run(Class<T> clazz, String[] args, Consumer<SpringApplicationBuilder> customizer) {
         // 🖥 Set native look-and-feel
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(clazz);
+        var builder = new SpringApplicationBuilder(clazz);
         builder.headless(false);
         customizer.accept(builder);
         builder.run(args);

@@ -25,8 +25,8 @@ final class PathUtils {
         Path fromPath = Paths.get(fromPackage.replace('.', '/'));
         Path toPath = Paths.get(toPackage.replace('.', '/'));
 
-        Path relativePath = fromPath.relativize(toPath);
-        String result = relativePath.toString().replace('\\', '/');
+        var relativePath = fromPath.relativize(toPath);
+        var result = relativePath.toString().replace('\\', '/');
 
         // If the path does not start with '.', it's a subfolder, so prepend './'
         if(!result.startsWith(".") && !result.startsWith("/")){

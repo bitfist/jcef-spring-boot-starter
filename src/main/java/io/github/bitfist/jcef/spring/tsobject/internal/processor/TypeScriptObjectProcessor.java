@@ -14,7 +14,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -55,7 +54,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
             return false;
         }
 
-        Set<? extends Element> javascriptObjects = roundEnv.getElementsAnnotatedWith(TypeScriptObject.class);
+        var javascriptObjects = roundEnv.getElementsAnnotatedWith(TypeScriptObject.class);
 
         if (javascriptObjects.isEmpty()) {
             messager.printMessage(Diagnostic.Kind.NOTE, "No @JavaScriptObject annotations found.");
@@ -114,7 +113,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         // Ensure the parent directory exists
         Files.createDirectories(destinationPath.getParent());
 
-        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(sourceClasspath)) {
+        try (var inputStream = this.getClass().getClassLoader().getResourceAsStream(sourceClasspath)) {
             if (inputStream == null) {
                 throw new IOException("Cannot find resource '" + sourceClasspath + "' on the classpath.");
             }
