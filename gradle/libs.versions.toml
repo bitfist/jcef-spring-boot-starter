@@ -10,11 +10,22 @@ dependencyManagement = { id = "io.spring.dependency-management", version = "1.1.
 openRewrite          = { id = "org.openrewrite.rewrite",         version = "7.11.0" }
 
 [libraries]
+# region BOMs
 springBootBom     = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot"     }
 springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version.ref = "springModulith" }
+# endregion
+
 jcef              = { module = "me.friwi:jcefmaven",                                version     = "135.0.20"       }
+
+# region Annotation processors
 springBootAutoconfigureProcessor = { module = "org.springframework.boot:spring-boot-autoconfigure-processor", version.ref = "springBoot" }
 springBootConfigurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "springBoot" }
+# endregion
+
+# region OpenRewrite
+openRewriteMigrateJava = { module = "org.openrewrite.recipe:rewrite-migrate-java", version = "3.13.0" }
+# endregion
+
 # region Tests
 compileTesting = { module = "com.google.testing.compile:compile-testing", version.ref = "compileTesting" }
 googleTruth    = { module = "com.google.truth:truth",                     version.ref = "googleTruth"    }

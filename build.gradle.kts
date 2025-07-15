@@ -40,7 +40,7 @@ dependencies {
 // region OpenRewrite
 
 dependencies {
-    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.13.0")
+    rewrite(libs.openRewriteMigrateJava)
 }
 
 rewrite {
