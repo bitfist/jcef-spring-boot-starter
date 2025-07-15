@@ -3,7 +3,6 @@
   "extends": ["config:recommended"],
   "gitAuthor": "bitfist <me@renelebherz.com>",
   "autodiscover": true,
-  "autodiscoverFilter": ["bitfist/jcef-spring-boot-starter"],
   "packageRules": [
     {
       "matchDatasources": ["maven"],
@@ -14,7 +13,7 @@
       ]
     },
     {
-      "matchUpdateTypes": ["patch", "minor"],
+      "matchUpdateTypes": ["major","minor", "patch"],
       "automerge": true
     }
   ]
