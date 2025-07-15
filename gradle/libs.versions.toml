@@ -2,7 +2,7 @@
 springBoot     = "3.5.3"
 springModulith = "1.4.1"
 compileTesting = "0.21.0"
-googleTruth    = "1.4.2"
+googleTruth    = "1.4.4"
 
 [plugins]
 lombok               = { id = "io.freefair.lombok",              version = "8.14"   }
