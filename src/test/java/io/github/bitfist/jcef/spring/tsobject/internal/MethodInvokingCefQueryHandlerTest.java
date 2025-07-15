@@ -103,7 +103,7 @@ class MethodInvokingCefQueryHandlerTest {
         // Before initialization, calling handle should fail to find the bean
         var message = new MethodInvokingCefMessage();
         message.setClassName(MyTestService.class.getName());
-        assertThrows(SecurityException.class, () -> newHandler.handle(message));
+        assertThrows(CefQueryException.class, () -> newHandler.handle(message));
 
         // After initialization
         newHandler.initialize();
@@ -199,10 +199,7 @@ class MethodInvokingCefQueryHandlerTest {
 
         var query = objectMapper.writeValueAsString(message);
 
-        SecurityException exception = assertThrows(
-                SecurityException.class,
-                () -> cefQueryHandler.handleQuery(query)
-        );
+        CefQueryException exception = assertThrows(CefQueryException.class, () -> cefQueryHandler.handleQuery(query));
 
         assertEquals("Class 'com.example.NonExistentService' is not registered as a @JavaScriptObject.", exception.getMessage());
     }
