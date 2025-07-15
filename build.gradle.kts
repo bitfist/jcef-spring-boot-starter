@@ -2,6 +2,7 @@ plugins {
     `java-library`
     alias(libs.plugins.lombok)
     alias(libs.plugins.dependencyManagement)
+    alias(libs.plugins.openRewrite)
     id("io.github.bitfist.github.release")
 }
 
@@ -35,6 +36,21 @@ dependencies {
     annotationProcessor(libs.springBootAutoconfigureProcessor)
     annotationProcessor(libs.springBootConfigurationProcessor)
 }
+
+// region OpenRewrite
+
+dependencies {
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.13.0")
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForGenericsConstructors")
+    activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForGenericMethodInvocations")
+    activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForPrimitive")
+    activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForObject")
+}
+
+// endregion
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
