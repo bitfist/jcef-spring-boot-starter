@@ -1,8 +1,8 @@
 package io.github.bitfist.jcef.spring.development;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.lang.Nullable;
 
 @ConfigurationProperties(prefix = "jcef.development")
 @RequiredArgsConstructor

@@ -1,8 +1,5 @@
 [versions]
 springBoot     = "3.5.3"
-springModulith = "1.4.1"
-compileTesting = "0.21.0"
-googleTruth    = "1.4.4"
 
 [plugins]
 lombok               = { id = "io.freefair.lombok",              version = "8.14"   }
@@ -12,10 +9,11 @@ openRewrite          = { id = "org.openrewrite.rewrite",         version = "7.11
 [libraries]
 # region BOMs
 springBootBom     = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot"     }
-springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version.ref = "springModulith" }
+springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version     = "1.4.1"          }
 # endregion
 
-jcef              = { module = "me.friwi:jcefmaven",                                version     = "135.0.20"       }
+jcef     = { module = "me.friwi:jcefmaven",    version = "135.0.20" }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.0"    }
 
 # region Annotation processors
 springBootAutoconfigureProcessor = { module = "org.springframework.boot:spring-boot-autoconfigure-processor", version.ref = "springBoot" }
@@ -27,6 +25,6 @@ openRewriteMigrateJava = { module = "org.openrewrite.recipe:rewrite-migrate-java
 # endregion
 
 # region Tests
-compileTesting = { module = "com.google.testing.compile:compile-testing", version.ref = "compileTesting" }
-googleTruth    = { module = "com.google.truth:truth",                     version.ref = "googleTruth"    }
+compileTesting = { module = "com.google.testing.compile:compile-testing", version = "0.21.0" }
+googleTruth    = { module = "com.google.truth:truth",                     version = "1.4.4"  }
 # endregion

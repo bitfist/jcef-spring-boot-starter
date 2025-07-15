@@ -1,6 +1,6 @@
 package io.github.bitfist.jcef.spring.browser;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface CefQueryHandler {
 

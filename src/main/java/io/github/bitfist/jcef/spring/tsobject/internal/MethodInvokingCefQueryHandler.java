@@ -6,7 +6,7 @@ import io.github.bitfist.jcef.spring.browser.CefQueryException;
 import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -7,8 +7,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

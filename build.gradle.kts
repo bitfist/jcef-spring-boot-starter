@@ -20,6 +20,7 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-databind")
     api("org.slf4j:slf4j-api")
     api(libs.jcef)
+    api(libs.jspecify)
 
     implementation(platform(libs.springModulithBom))
     implementation("org.springframework.modulith:spring-modulith-core")
@@ -50,6 +51,7 @@ rewrite {
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForGenericMethodInvocations")
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForPrimitive")
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForObject")
+    activeRecipe("org.openrewrite.java.jspecify.MigrateFromSpringFrameworkAnnotations")
 }
 
 // endregion

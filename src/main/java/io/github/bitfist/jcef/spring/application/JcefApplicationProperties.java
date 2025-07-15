@@ -1,9 +1,9 @@
 package io.github.bitfist.jcef.spring.application;
 
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 import java.nio.file.Path;

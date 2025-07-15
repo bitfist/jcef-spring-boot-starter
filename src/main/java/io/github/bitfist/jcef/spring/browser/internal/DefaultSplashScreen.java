@@ -4,8 +4,8 @@ import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
 import lombok.SneakyThrows;
 import me.friwi.jcefmaven.EnumProgress;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.info.BuildProperties;
-import org.springframework.lang.Nullable;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
