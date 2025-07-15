@@ -1,12 +1,16 @@
 name: Renovate
 on:
   schedule:
-    - cron: '45 * * * *'
+    - cron: '6 * * * *'
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: renovatebot/github-action@v36
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v43.0.3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          docker-cmd-file: .github/renovate-entrypoint.sh
+          docker-user: root
+          token: ${{ secrets.RENOVATE_TOKEN }}
