@@ -2,11 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "gitAuthor": "bitfist <me@renelebherz.com>",
+  "autodiscover": true,
+  "autodiscoverFilter": ["bitfist/jcef-spring-boot-starter"],
   "packageRules": [
     {
       "matchDatasources": ["maven"],
       "registryUrls": [
         "https://repo1.maven.org/maven2/",
+        "https://plugins.gradle.org/m2/",
         "https://maven.pkg.github.com/bitfist/gradle-github-support"
       ]
     },
