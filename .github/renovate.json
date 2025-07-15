@@ -11,22 +11,8 @@
       ]
     },
     {
-      "matchDatasources": ["maven"],
-      "matchUpdateTypes": ["patch","minor"],
-      "automerge": true,
-      "automergeType": "branch"
-    },
-    {
-      "matchManagers": ["gradle-wrapper"],
-      "matchUpdateTypes": ["major","minor","patch"],
-      "automerge": true,
-      "automergeType": "branch"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["patch","minor","major"],
-      "automerge": true,
-      "automergeType": "branch"
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
     }
   ],
   "hostRules": [
