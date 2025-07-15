@@ -1,13 +1,15 @@
-package io.github.bitfist.jcef.spring.debug.internal;
+package io.github.bitfist.jcef.spring.development.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
+import io.github.bitfist.jcef.spring.development.DevelopmentConfigurationProperties;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import javax.swing.SwingUtilities;
@@ -20,10 +22,11 @@ import javax.swing.SwingUtilities;
  * </ul>
  */
 @AutoConfiguration
-class DebugAutoConfiguration {
+@EnableConfigurationProperties(DevelopmentConfigurationProperties.class)
+class DevelopmentAutoConfiguration {
 
     @Bean
-    @ConditionalOnProperty(name = "jcef.development-options.show-developer-tools", havingValue = "true")
+    @ConditionalOnProperty(name = "jcef.development.show-developer-tools", havingValue = "true")
     CefClientCustomizer developerToolsCustomizer() {
         return cefClient -> {
             cefClient.addLoadHandler(new CefLoadHandlerAdapter() {
@@ -36,7 +39,7 @@ class DebugAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "jcef.development-options.debug-port")
+    @ConditionalOnProperty(name = "jcef.development.debug-port")
     CefApplicationCustomizer debugPortCustomizer(JcefApplicationProperties applicationProperties) {
         return builder -> {
             builder.getCefSettings().remote_debugging_port = applicationProperties.getDevelopmentOptions().debugPort();

@@ -1,10 +1,13 @@
 package io.github.bitfist.jcef.spring.tsobject.internal;
 
+import io.github.bitfist.jcef.spring.tsobject.TypeScriptObjectProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
+@EnableConfigurationProperties(TypeScriptObjectProperties.class)
 class TypeScriptObjectAutoConfiguration {
 
     @Bean

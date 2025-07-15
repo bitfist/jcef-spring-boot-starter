@@ -14,12 +14,5 @@
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true
     }
-  ],
-  "hostRules": [
-    {
-      "matchHost": "maven.pkg.github.com",
-      "hostType": "maven",
-      "token": "{{secrets.GITHUB_TOKEN}}"
-    }
   ]
 }

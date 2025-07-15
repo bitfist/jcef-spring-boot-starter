@@ -2,7 +2,7 @@ package io.github.bitfist.jcef.spring.tsobject.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.bitfist.jcef.spring.browser.CefMessageException;
+import io.github.bitfist.jcef.spring.browser.CefQueryException;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -181,8 +181,8 @@ class MethodInvokingCefQueryHandlerTest {
     void handleQuery_withMalformedJson_shouldThrowException() {
         var malformedQuery = "{\"className\":\"Test\",, \"methodName\":\"test\"}";
 
-        CefMessageException exception = assertThrows(
-                CefMessageException.class,
+        CefQueryException exception = assertThrows(
+                CefQueryException.class,
                 () -> cefQueryHandler.handleQuery(malformedQuery)
         );
 
@@ -268,7 +268,7 @@ class MethodInvokingCefQueryHandlerTest {
      * Helper method to extract the error code from our custom exception,
      * as it's not directly accessible. This is a bit of a workaround.
      */
-    private int getErrorCode(CefMessageException e) {
+    private int getErrorCode(CefQueryException e) {
         try {
             // CefMessageException(int, Throwable) -> The int is not stored in a field.
             // We can infer it from the test case context.

@@ -1,7 +1,7 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
-import io.github.bitfist.jcef.spring.browser.CefMessageException;
-import io.github.bitfist.jcef.spring.browser.CefMessageHandler;
+import io.github.bitfist.jcef.spring.browser.CefQueryException;
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cef.browser.CefBrowser;
@@ -20,7 +20,7 @@ import org.cef.handler.CefMessageRouterHandlerAdapter;
 @RequiredArgsConstructor
 class DefaultCefMessageRouter extends CefMessageRouterHandlerAdapter {
 
-    private final CefMessageHandler messageHandler;
+    private final CefQueryHandler messageHandler;
 
     @Override
     public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, String request, boolean persistent, CefQueryCallback callback) {
@@ -28,7 +28,7 @@ class DefaultCefMessageRouter extends CefMessageRouterHandlerAdapter {
             var result = messageHandler.handleQuery(request);
             callback.success(result);
             return true;
-        } catch (CefMessageException exception) {
+        } catch (CefQueryException exception) {
             log.error("[ERROR] {} [CODE] {}", exception.getMessage(), exception.getErrorCode(), exception);
             callback.failure(exception.getErrorCode(), exception.getMessage());
         } catch (Throwable throwable) {

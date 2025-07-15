@@ -2,13 +2,15 @@ package io.github.bitfist.jcef.spring.tsobject.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.bitfist.jcef.spring.browser.CefMessageException;
-import io.github.bitfist.jcef.spring.browser.CefMessageHandler;
+import io.github.bitfist.jcef.spring.browser.CefQueryException;
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
+@Slf4j
 @RequiredArgsConstructor
-class MethodInvokingCefQueryHandler implements CefMessageHandler {
+class MethodInvokingCefQueryHandler implements CefQueryHandler {
 
     private static final int JSON_MESSAGE_PROCESSING_ERROR = 1001;
     private static final int JSON_RETURN_VALUE_PROCESSING_ERROR = 1002;
@@ -18,11 +20,16 @@ class MethodInvokingCefQueryHandler implements CefMessageHandler {
 
     @Override
     public @Nullable String handleQuery(@Nullable String query) {
+        if (query == null) {
+            log.warn("Received null query");
+            return null;
+        }
         MethodInvokingCefMessage message;
         try {
             message = objectMapper.readValue(query, MethodInvokingCefMessage.class);
         } catch (JsonProcessingException jsonProcessingException) {
-            throw new CefMessageException(JSON_MESSAGE_PROCESSING_ERROR, jsonProcessingException);
+            log.error("Failed to deserialize query: {}", query, jsonProcessingException);
+            throw new CefQueryException(JSON_MESSAGE_PROCESSING_ERROR, jsonProcessingException);
         }
 
         var result = messageHandler.handle(message);
@@ -31,7 +38,8 @@ class MethodInvokingCefQueryHandler implements CefMessageHandler {
             var convertedResult = serializeIfComplex(result);
             return convertedResult == null ? null : convertedResult.toString();
         } catch (JsonProcessingException e) {
-            throw new CefMessageException(JSON_RETURN_VALUE_PROCESSING_ERROR, e);
+            log.error("Failed to serialize return value: {}", result, e);
+            throw new CefQueryException(JSON_RETURN_VALUE_PROCESSING_ERROR, e);
         }
     }
 

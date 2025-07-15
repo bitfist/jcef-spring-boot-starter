@@ -15,14 +15,16 @@ repositories {
 
 dependencies {
     api(platform(libs.springBootBom))
+    api("jakarta.annotation:jakarta.annotation-api")
     api("org.springframework.boot:spring-boot-autoconfigure")
-    api("org.springframework.boot:spring-boot-starter-validation")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("org.slf4j:slf4j-api")
     api(libs.jcef)
 
     implementation(platform(libs.springModulithBom))
     implementation("org.springframework.modulith:spring-modulith-core")
+
+    compileOnly("org.springframework:spring-web")
 
     // region Test
     testImplementation(platform(libs.springModulithBom))

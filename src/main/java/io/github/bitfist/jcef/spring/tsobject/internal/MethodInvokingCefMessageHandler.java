@@ -1,10 +1,12 @@
 package io.github.bitfist.jcef.spring.tsobject.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.bitfist.jcef.spring.browser.CefQueryException;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
@@ -14,8 +16,11 @@ import java.util.Map;
 
 import static io.github.bitfist.jcef.spring.tsobject.internal.MethodInvokingCefQueryHandler.isComplexType;
 
+@Slf4j
 @RequiredArgsConstructor
 class MethodInvokingCefMessageHandler {
+
+    private static final int JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT = 2001;
 
     private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,7 +59,8 @@ class MethodInvokingCefMessageHandler {
     private Object findBean(String className) {
         var bean = beans.get(className);
         if (bean == null) {
-            throw new SecurityException("Class '" + className + "' is not registered as a @JavaScriptObject.");
+            log.error("Failed to find JavaScriptObject with class name '{}'", className);
+            throw new CefQueryException(JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT, "Class '" + className + "' is not registered as a @JavaScriptObject.");
         }
         return bean;
     }

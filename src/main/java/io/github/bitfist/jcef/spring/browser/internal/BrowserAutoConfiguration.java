@@ -8,7 +8,7 @@ import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
-import io.github.bitfist.jcef.spring.browser.CefMessageHandler;
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.friwi.jcefmaven.CefAppBuilder;
@@ -109,7 +109,7 @@ class BrowserAutoConfiguration {
     }
 
     @Bean
-    CefClientCustomizer cefMessageHandlingClientCustomizer(CefMessageHandler messageHandler) {
+    CefClientCustomizer cefMessageHandlingClientCustomizer(CefQueryHandler messageHandler) {
         return client -> {
             CefMessageRouter messageRouter = CefMessageRouter.create();
             messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);

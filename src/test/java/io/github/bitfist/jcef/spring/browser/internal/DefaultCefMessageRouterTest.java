@@ -1,7 +1,7 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
-import io.github.bitfist.jcef.spring.browser.CefMessageException;
-import io.github.bitfist.jcef.spring.browser.CefMessageHandler;
+import io.github.bitfist.jcef.spring.browser.CefQueryException;
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
@@ -33,7 +33,7 @@ class DefaultCefMessageRouterTest {
 
     // Mocks for the dependencies required by the onQuery method.
     @Mock
-    private CefMessageHandler messageHandler;
+    private CefQueryHandler messageHandler;
 
     @Mock
     private CefBrowser browser;
@@ -50,7 +50,7 @@ class DefaultCefMessageRouterTest {
 
     @Test
     @DisplayName("✅ Success Path - Should handle query successfully and call callback.success")
-    void onQuery_whenHandlerSucceeds_shouldCallSuccess() throws CefMessageException {
+    void onQuery_whenHandlerSucceeds_shouldCallSuccess() throws CefQueryException {
         // Arrange: Define the expected successful result from the message handler.
         var expectedResult = "{\"status\":\"success\",\"data\":\"some result\"}";
         when(messageHandler.handleQuery(TEST_REQUEST)).thenReturn(expectedResult);
@@ -71,11 +71,11 @@ class DefaultCefMessageRouterTest {
 
     @Test
     @DisplayName("❌ Exception Path - Should handle CefMessageException and call callback.failure")
-    void onQuery_whenHandlerThrowsCefMessageException_shouldCallFailure() throws CefMessageException {
+    void onQuery_whenHandlerThrowsCefMessageException_shouldCallFailure() throws CefQueryException {
         // Arrange: Configure the message handler to throw a specific CefMessageException.
         var errorCode = 404;
         var errorMessage = "Resource not found";
-        var cefException = new CefMessageException(errorCode, new Exception(errorMessage));
+        var cefException = new CefQueryException(errorCode, new Exception(errorMessage));
         when(messageHandler.handleQuery(TEST_REQUEST)).thenThrow(cefException);
 
         // Act: Call the method under test.
@@ -94,7 +94,7 @@ class DefaultCefMessageRouterTest {
 
     @Test
     @DisplayName("💥 Exception Path - Should handle unexpected Throwable and call callback.failure")
-    void onQuery_whenHandlerThrowsUnexpectedException_shouldCallFailureWith500() throws CefMessageException {
+    void onQuery_whenHandlerThrowsUnexpectedException_shouldCallFailureWith500() throws CefQueryException {
         // Arrange: Configure the message handler to throw a generic, unexpected exception.
         var errorMessage = "Something went terribly wrong!";
         var unexpectedException = new RuntimeException(errorMessage);
