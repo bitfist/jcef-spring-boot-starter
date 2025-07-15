@@ -4,12 +4,24 @@
   "gitAuthor": "bitfist <me@renelebherz.com>",
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true,
+      "matchDatasources": ["maven"],
       "registryUrls": [
         "https://repo1.maven.org/maven2/",
         "https://maven.pkg.github.com/bitfist/gradle-github-support"
       ]
+    },
+    {
+      "matchDatasources": ["maven"],
+      "matchUpdateTypes": ["patch","minor"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ],
+  "hostRules": [
+    {
+      "matchHost": "maven.pkg.github.com",
+      "hostType": "maven",
+      "token": "{{secrets.GITHUB_TOKEN}}"
     }
   ]
 }
