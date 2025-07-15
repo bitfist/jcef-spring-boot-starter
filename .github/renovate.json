@@ -5,7 +5,11 @@
   "packageRules": [
     {
       "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
+      "automerge": true,
+      "registryUrls": [
+        "https://repo1.maven.org/maven2/",
+        "https://maven.pkg.github.com/bitfist/gradle-github-support"
+      ]
     }
   ]
 }
