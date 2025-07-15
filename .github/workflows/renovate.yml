@@ -17,4 +17,4 @@ jobs:
           RENOVATE_AUTODISCOVER: true
           RENOVATE_GIT_AUTHOR: "bitfist <me@renelebherz.com>"
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
