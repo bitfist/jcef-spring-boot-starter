@@ -84,13 +84,8 @@ class MethodInvokingCefQueryHandlerTest {
     void setUp() {
         // Mock the ApplicationContext to return our test service
         var testService = new MyTestService();
-        var beans = new HashMap<String, Object>();
-        beans.put("myTestService", testService);
 
-        when(applicationContext.getBeansWithAnnotation(TypeScriptObject.class)).thenReturn(beans);
-
-        // Manually trigger the PostConstruct method
-        cefMessageHandler.initialize();
+        when(applicationContext.getBean(MyTestService.class)).thenReturn(testService);
     }
 
     @Test
@@ -100,13 +95,12 @@ class MethodInvokingCefQueryHandlerTest {
         // To do this, we'll create a new instance and call initialize manually.
         var newHandler = new MethodInvokingCefMessageHandler(applicationContext);
 
-        // Before initialization, calling handle should fail to find the bean
+        // Before full message initialization, calling handle should fail to find the bean
         var message = new MethodInvokingCefMessage();
         message.setClassName(MyTestService.class.getName());
         assertThrows(CefQueryException.class, () -> newHandler.handle(message));
 
         // After initialization
-        newHandler.initialize();
         message.setMethodName("doNothing"); // A method that is easy to call
         message.setParameters(Collections.emptyMap());
 
@@ -201,7 +195,7 @@ class MethodInvokingCefQueryHandlerTest {
 
         CefQueryException exception = assertThrows(CefQueryException.class, () -> cefQueryHandler.handleQuery(query));
 
-        assertEquals("Class 'com.example.NonExistentService' is not registered as a @JavaScriptObject.", exception.getMessage());
+        assertEquals("Class 'com.example.NonExistentService' not found.", exception.getMessage());
     }
 
     @Test
@@ -214,7 +208,7 @@ class MethodInvokingCefQueryHandlerTest {
         var query = objectMapper.writeValueAsString(message);
 
         assertThrows(
-                NoSuchMethodException.class,
+                CefQueryException.class,
                 () -> cefQueryHandler.handleQuery(query)
         );
     }
@@ -229,12 +223,12 @@ class MethodInvokingCefQueryHandlerTest {
 
         var query = objectMapper.writeValueAsString(message);
 
-        NoSuchMethodException exception = assertThrows(
-                NoSuchMethodException.class,
+        CefQueryException exception = assertThrows(
+                CefQueryException.class,
                 () -> cefQueryHandler.handleQuery(query)
         );
 
-        assertTrue(exception.getMessage().contains("with 0 parameters found"));
+        assertTrue(exception.getMessage().contains("with 0 parameters not found"));
     }
 
     @Test

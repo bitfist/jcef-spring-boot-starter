@@ -2,16 +2,14 @@ package io.github.bitfist.jcef.spring.tsobject.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bitfist.jcef.spring.browser.CefQueryException;
-import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 import static io.github.bitfist.jcef.spring.tsobject.internal.MethodInvokingCefQueryHandler.isComplexType;
@@ -21,22 +19,11 @@ import static io.github.bitfist.jcef.spring.tsobject.internal.MethodInvokingCefQ
 class MethodInvokingCefMessageHandler {
 
     private static final int JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT = 2001;
+    private static final int JAVA_METHOD_NOT_FOUND = 2002;
+    private static final int JAVA_CLASS_NOT_FOUND = 2003;
 
     private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Map<String, Object> beans = new HashMap<>();
-
-    /**
-     * Scans the ApplicationContext for beans annotated with @JavaScriptObject
-     * and populates the cache upon bean initialization.
-     */
-    @PostConstruct
-    void initialize() {
-        var beans = applicationContext.getBeansWithAnnotation(TypeScriptObject.class);
-        for (Object bean : beans.values()) {
-            this.beans.put(bean.getClass().getName(), bean);
-        }
-    }
 
     /**
      * Handles the incoming MethodInvokingCefMessage by invoking the specified method on a cached bean.
@@ -57,12 +44,15 @@ class MethodInvokingCefMessageHandler {
      * Finds a bean from the cache using its class name.
      */
     private Object findBean(String className) {
-        var bean = beans.get(className);
-        if (bean == null) {
-            log.error("Failed to find JavaScriptObject with class name '{}'", className);
-            throw new CefQueryException(JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT, "Class '" + className + "' is not registered as a @JavaScriptObject.");
+        try {
+            return applicationContext.getBean(Class.forName(className));
+        } catch (NoSuchBeanDefinitionException exception) {
+            log.error("Failed to find TypeScriptObject with class name '{}'", className);
+            throw new CefQueryException(JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT, "Class '" + className + "' is not registered as a @TypeScriptObject.");
+        } catch (ClassNotFoundException exception) {
+            log.error("Failed to find class with name '{}'", className);
+            throw new CefQueryException(JAVA_CLASS_NOT_FOUND, "Class '" + className + "' not found.");
         }
-        return bean;
     }
 
     /**
@@ -77,7 +67,7 @@ class MethodInvokingCefMessageHandler {
                 return method;
             }
         }
-        throw new NoSuchMethodException("No suitable method '" + methodName + "' with " + parameterCount + " parameters found in " + beanClass.getName());
+        throw new CefQueryException(JAVA_METHOD_NOT_FOUND, "Method '" + methodName + "' with " + parameterCount + " parameters not found.");
     }
 
     /**
