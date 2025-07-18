@@ -41,7 +41,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
     public static final String JCEF_SERVICE_TYPE_WEB = "web";
     public static final String JCEF_SERVICE_TYPE_QUERY = "query";
     public static final String JCEF_WEB_HOST = "http://localhost";
-    public static final String JCEF_WEB_PORT = "3000";
+    public static final String JCEF_WEB_PORT = "8080";
 
     private Messager messager;
     private TypeScriptGenerator typeScriptGenerator;
