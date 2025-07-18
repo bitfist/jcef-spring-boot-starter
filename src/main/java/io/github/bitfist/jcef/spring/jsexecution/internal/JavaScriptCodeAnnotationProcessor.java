@@ -39,7 +39,8 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
+        var sourceVersions = SourceVersion.values();
+        return sourceVersions[sourceVersions.length - 1];
     }
 
     @Override

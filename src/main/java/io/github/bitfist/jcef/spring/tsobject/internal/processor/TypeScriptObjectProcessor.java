@@ -70,7 +70,8 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
+        var sourceVersions = SourceVersion.values();
+        return sourceVersions[sourceVersions.length - 1];
     }
 
     private @Nullable ServiceType getServiceType(ProcessingEnvironment processingEnv) {
