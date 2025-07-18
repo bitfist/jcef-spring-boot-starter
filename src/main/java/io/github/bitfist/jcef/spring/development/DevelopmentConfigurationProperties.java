@@ -1,12 +1,14 @@
 package io.github.bitfist.jcef.spring.development;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@Data
 @ConfigurationProperties(prefix = "jcef.development")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DevelopmentConfigurationProperties {
-    private final @Nullable Integer debugPort;
-    private final boolean showDeveloperTools;
+    private @Nullable Integer debugPort;
+    private boolean showDeveloperTools;
 }

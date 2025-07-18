@@ -23,17 +23,14 @@ public class JcefApplicationProperties {
     private final String applicationName;
     @Nullable
     private final String splashScreenClasspathResource;
-    @Nullable
-    private final DevelopmentOptions developmentOptions;
     private String distributionClasspath;
 
-    public JcefApplicationProperties(String applicationName, @Nullable String splashScreenClasspathResource, @Nullable String distributionClasspath, @Nullable DevelopmentOptions developmentOptions) {
+    public JcefApplicationProperties(String applicationName, @Nullable String splashScreenClasspathResource, @Nullable String distributionClasspath) {
         if (isBlank(applicationName)) {
             throw new IllegalArgumentException("jcef.application-name name must not be blank");
         }
         this.applicationName = applicationName;
         this.splashScreenClasspathResource = splashScreenClasspathResource;
-        this.developmentOptions = developmentOptions;
         if (isBlank(distributionClasspath)) {
             this.distributionClasspath = "ui";
         } else {
@@ -102,7 +99,4 @@ public class JcefApplicationProperties {
     }
 
     // endregion
-
-    public record DevelopmentOptions(@Nullable Integer debugPort, boolean showDeveloperTools) {
-    }
 }

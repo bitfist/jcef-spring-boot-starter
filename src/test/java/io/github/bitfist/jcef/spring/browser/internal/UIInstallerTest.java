@@ -1,7 +1,6 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.application.JcefApplicationProperties.DevelopmentOptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
@@ -46,7 +45,7 @@ class UIInstallerTest {
     @Test
     @DisplayName("🔖  extractRelative strips prefix and leading slash")
     void whenExtractRelative_thenReturnsRelativePath() throws Exception {
-        var props = new JcefApplicationProperties("app", null, "ui", new DevelopmentOptions(null, false));
+        var props = new JcefApplicationProperties("app", null, "ui");
         var installer = new TestUIInstaller(props);
 
         Resource res = mock(Resource.class);
@@ -63,7 +62,7 @@ class UIInstallerTest {
         Path tmp = Files.createTempDirectory("uitest");
         tmp.toFile().deleteOnExit();
 
-        var props = new JcefApplicationProperties("app", null, "ui", new DevelopmentOptions(null, false));
+        var props = new JcefApplicationProperties("app", null, "ui");
         var installer = new TestUIInstaller(props);
 
         assertTrue(installer.isEmptyDirectoryForTest(tmp));

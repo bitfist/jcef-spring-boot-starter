@@ -85,17 +85,7 @@ Autoconfiguration for debugging features:
 
 ## 🚀 Getting Started
 
-Add the starter to your `pom.xml`:
-
-```xml
-<dependency>
-  <groupId>io.github.bitfist</groupId>
-  <artifactId>jcef-spring-boot-starter</artifactId>
-  <version>...</version>
-</dependency>
-```
-
-Enable annotation processing in your build.
+See the [jcef-gradle-plugin](https://github.com/bitfist/jcef-gradle-plugin) for details on how to get started.
 
 ## ⚙️ Configuration
 
@@ -106,7 +96,7 @@ jcef:
   application-name: my-app
   splash-screen-classpath-resource: splash.png
   distribution-classpath: ui
-  development-options:
+  development:
     show-developer-tools: true
     debug-port: 9222
 ```

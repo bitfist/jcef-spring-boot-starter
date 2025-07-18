@@ -1,6 +1,5 @@
 package io.github.bitfist.jcef.spring.development.internal;
 
-import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
 import io.github.bitfist.jcef.spring.development.DevelopmentConfigurationProperties;
@@ -40,9 +39,9 @@ class DevelopmentAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "jcef.development.debug-port")
-    CefApplicationCustomizer debugPortCustomizer(JcefApplicationProperties applicationProperties) {
+    CefApplicationCustomizer debugPortCustomizer(DevelopmentConfigurationProperties applicationProperties) {
         return builder -> {
-            builder.getCefSettings().remote_debugging_port = applicationProperties.getDevelopmentOptions().debugPort();
+            builder.getCefSettings().remote_debugging_port = applicationProperties.getDebugPort();
             builder.addJcefArgs("--remote-allow-origins=*");
         };
     }
