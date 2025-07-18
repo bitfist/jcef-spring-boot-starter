@@ -91,7 +91,7 @@ class TypeScriptGenerator {
         var methodsBuilder = new StringBuilder();
         List<ExecutableElement> methods = ElementFilter.methodsIn(elementUtils.getAllMembers(classElement))
                 .stream()
-                .filter(m -> m.getModifiers().contains(Modifier.PUBLIC) && !m.getModifiers().contains(Modifier.STATIC))
+                .filter(m -> !m.getModifiers().contains(Modifier.PRIVATE) && !m.getModifiers().contains(Modifier.STATIC))
                 .filter(m -> !m.getEnclosingElement().toString().equals("java.lang.Object"))
                 .toList();
 
