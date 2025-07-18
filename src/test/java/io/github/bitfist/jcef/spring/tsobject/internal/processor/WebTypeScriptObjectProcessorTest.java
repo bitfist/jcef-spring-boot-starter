@@ -313,18 +313,26 @@ class WebTypeScriptObjectProcessorTest {
         // 2. Define the expected paths for the copied files.
         var CefRestServicePath = temporaryOutputDirectory.resolve("jcef/CefRestService.ts");
         var cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
+        var responseTypePath = temporaryOutputDirectory.resolve("jcef/ResponseType.ts");
+        var responseValueConverterPath = temporaryOutputDirectory.resolve("jcef/ResponseValueConverter.ts");
 
         // 3. Assert that the files were created.
         assertTrue(Files.exists(CefRestServicePath), "CefRestService.ts should have been created.");
         assertTrue(Files.exists(cefDtsPath), "cef.d.ts should have been created.");
+        assertTrue(Files.exists(responseTypePath), "ResponseType.ts should have been created.");
+        assertTrue(Files.exists(responseValueConverterPath), "ResponseValueConverter.ts should have been created.");
 
         // 4. Load the original content from test resources.
         var expectedCefRestServiceContent = getResourceContent("generator/templates/CefRestService.ts");
         var expectedCefDtsContent = getResourceContent("generator/templates/cef.d.ts");
+        var expectedResponseTypeContent = getResourceContent("generator/templates/ResponseType.ts");
+        var expectedResponseValueConverterContent = getResourceContent("generator/templates/ResponseValueConverter.ts");
 
         // 5. Read the content of the newly created files.
         String actualCefRestServiceContent = Files.readString(CefRestServicePath);
         String actualCefDtsContent = Files.readString(cefDtsPath);
+        String actualResponseTypeContent = Files.readString(responseTypePath);
+        String actualResponseValueConverterContent = Files.readString(responseValueConverterPath);
 
         expectedCefRestServiceContent = expectedCefRestServiceContent.replace("$host", TypeScriptObjectProcessor.JCEF_WEB_HOST);
         expectedCefRestServiceContent = expectedCefRestServiceContent.replace("$port", TypeScriptObjectProcessor.JCEF_WEB_PORT);
@@ -332,6 +340,8 @@ class WebTypeScriptObjectProcessorTest {
         // 6. Assert that the content of the copied files matches the original resources.
         assertEquals(expectedCefRestServiceContent, actualCefRestServiceContent, "Content of CefRestService.ts does not match.");
         assertEquals(expectedCefDtsContent, actualCefDtsContent, "Content of cef.d.ts does not match.");
+        assertEquals(expectedResponseTypeContent, actualResponseTypeContent, "Content of ResponseType.ts does not match.");
+        assertEquals(expectedResponseValueConverterContent, actualResponseValueConverterContent, "Content of ResponseValueConverter.ts does not match.");
     }
 
     @Test

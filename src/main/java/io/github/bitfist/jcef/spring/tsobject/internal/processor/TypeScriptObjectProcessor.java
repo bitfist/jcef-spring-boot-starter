@@ -149,6 +149,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         }
 
         copyFileFromClasspath("generator/templates/ResponseValueConverter.ts", Path.of(this.outputPath, "jcef", "ResponseValueConverter.ts"), Function.identity());
+        copyFileFromClasspath("generator/templates/ResponseType.ts", Path.of(this.outputPath, "jcef", "ResponseType.ts"), Function.identity());
         copyFileFromClasspath("generator/templates/cef.d.ts", Path.of(this.outputPath, "types", "cef.d.ts"), Function.identity());
     }
 
