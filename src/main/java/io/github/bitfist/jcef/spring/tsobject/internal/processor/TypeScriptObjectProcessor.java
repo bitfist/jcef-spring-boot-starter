@@ -1,7 +1,6 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;
-import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -10,13 +9,11 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +27,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
         "io.github.bitfist.jcef.spring.tsobject.TypeScriptObject",
         "io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration"
 })
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
 @SupportedOptions({
         TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION, TypeScriptObjectProcessor.JCEF_SERVICE_TYPE_OPTION,
         TypeScriptObjectProcessor.JCEF_WEB_HOST_OPTION, TypeScriptObjectProcessor.JCEF_WEB_PORT_OPTION
@@ -70,6 +66,11 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         }
 
         this.typeScriptGenerator = new TypeScriptGenerator(outputPath, serviceType, processingEnv.getElementUtils(), messager);
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
 
     private @Nullable ServiceType getServiceType(ProcessingEnvironment processingEnv) {

@@ -8,7 +8,6 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 @SupportedAnnotationTypes("io.github.bitfist.jcef.spring.jsexecution.JavaScriptCode")
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
@@ -37,6 +35,11 @@ public class JavaScriptCodeAnnotationProcessor extends AbstractProcessor {
         super.init(env);
         this.filer = env.getFiler();
         this.messager = env.getMessager();
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
 
     @Override

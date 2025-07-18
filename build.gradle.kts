@@ -47,6 +47,7 @@ dependencies {
 }
 
 rewrite {
+    activeRecipe("org.openrewrite.java.RemoveUnusedImports")
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForGenericsConstructors")
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForGenericMethodInvocations")
     activeRecipe("org.openrewrite.java.migrate.lang.var.UseVarForPrimitive")
