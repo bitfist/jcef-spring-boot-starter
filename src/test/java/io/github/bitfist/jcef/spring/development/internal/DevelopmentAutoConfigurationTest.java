@@ -43,8 +43,8 @@ class DevelopmentAutoConfigurationTest {
     @Test
     @DisplayName("🔍 developerToolsCustomizer registers a load handler")
     void developerToolsCustomizerRegistersHandler() {
-        DevelopmentAutoConfiguration cfg = new DevelopmentAutoConfiguration();
-        CefClientCustomizer customizer = cfg.developerToolsCustomizer();
+        var cfg = new DevelopmentAutoConfiguration();
+        var customizer = cfg.developerToolsCustomizer();
         org.cef.CefClient client = mock(org.cef.CefClient.class);
 
         customizer.accept(client);
@@ -58,12 +58,12 @@ class DevelopmentAutoConfigurationTest {
     @DisplayName("🛠️ debugPortCustomizer sets port and adds args")
     void debugPortCustomizerSetsPortAndArgs() {
         // simulate having debug-port property
-        DevelopmentConfigurationProperties props = new DevelopmentConfigurationProperties(5555, false);
-        DevelopmentAutoConfiguration cfg = new DevelopmentAutoConfiguration();
-        CefApplicationCustomizer customizer = cfg.debugPortCustomizer(props);
+        var props = new DevelopmentConfigurationProperties(5555, false);
+        var cfg = new DevelopmentAutoConfiguration();
+        var customizer = cfg.debugPortCustomizer(props);
 
         CefAppBuilder builder = mock(CefAppBuilder.class);
-        CefSettings settings = new CefSettings();
+        var settings = new CefSettings();
         when(builder.getCefSettings()).thenReturn(settings);
 
         customizer.accept(builder);

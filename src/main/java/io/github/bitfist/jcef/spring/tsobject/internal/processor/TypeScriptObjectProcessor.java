@@ -73,7 +73,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
     }
 
     private @Nullable ServiceType getServiceType(ProcessingEnvironment processingEnv) {
-        String serviceType = processingEnv.getOptions().get(JCEF_SERVICE_TYPE_OPTION);
+        var serviceType = processingEnv.getOptions().get(JCEF_SERVICE_TYPE_OPTION);
         if (isBlank(serviceType)) {
             messager.printError("No service type defined. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
             return null;
@@ -163,19 +163,19 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         // Ensure the parent directory exists
         Files.createDirectories(destinationPath.getParent());
 
-        try (InputStream inputStream = TypeScriptObjectProcessor.class.getClassLoader().getResourceAsStream(sourceClasspath)) {
+        try (var inputStream = TypeScriptObjectProcessor.class.getClassLoader().getResourceAsStream(sourceClasspath)) {
             if (inputStream == null) {
                 throw new IOException("Cannot find resource '" + sourceClasspath + "' on the classpath.");
             }
 
             // Read all bytes and convert to string
-            String original = new String(
+            var original = new String(
                     inputStream.readAllBytes(),
                     StandardCharsets.UTF_8
             );
 
             // Process content
-            String processed = processor.apply(original);
+            var processed = processor.apply(original);
 
             // Write processed content
             Files.writeString(
