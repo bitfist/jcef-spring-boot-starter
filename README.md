@@ -8,6 +8,10 @@
 
 Start with examples on how to use the API, especially the annotations and the customizers.
 
+> [!IMPORTANT]  
+> This project uses dependencies provided from GitHub. You therefore need to set your GitHub user `GPR_USER` and 
+> personal access token `GPR_TOKEN` in your `~/.gradle/gradle.properties`
+
 ---
 
 Table of contents
