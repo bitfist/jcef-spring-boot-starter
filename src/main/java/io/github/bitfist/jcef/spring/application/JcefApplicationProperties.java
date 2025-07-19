@@ -51,6 +51,7 @@ public class JcefApplicationProperties {
     private Path installationPath; // Base directory for app data
     private Path jcefInstallationPath; // Subdirectory for JCEF binaries
     private Path uiInstallationPath; // Subdirectory for UI files
+    private Path jcefDataPath; // Subdirectory for JCEF data
 
     /**
      * 🗂 Determine the platform-specific installation path.
@@ -80,13 +81,23 @@ public class JcefApplicationProperties {
     }
 
     /**
-     * 📦 Path to JCEF bundle directory.
+     * 📦 Path to JCEF installation directory.
      */
     public Path getJcefInstallationPath() {
         if (jcefInstallationPath == null) {
             jcefInstallationPath = getInstallationPath().resolve("bundle");
         }
         return jcefInstallationPath;
+    }
+
+    /**
+     * 📦 Path to JCEF data directory.
+     */
+    public Path getJcefDataPath() {
+        if (jcefDataPath == null) {
+            jcefDataPath = getInstallationPath().resolve("cef_data");
+        }
+        return jcefDataPath;
     }
 
     /**

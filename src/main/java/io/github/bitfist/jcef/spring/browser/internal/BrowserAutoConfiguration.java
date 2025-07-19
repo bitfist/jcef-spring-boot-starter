@@ -74,6 +74,7 @@ class BrowserAutoConfiguration {
         var builder = new CefAppBuilder();
         builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
+        builder.getCefSettings().root_cache_path = applicationProperties.getJcefDataPath().toFile().getAbsolutePath();
         builder.setProgressHandler(splashScreen);
         builder.setAppHandler(new MavenCefAppHandlerAdapter() {
             @Override

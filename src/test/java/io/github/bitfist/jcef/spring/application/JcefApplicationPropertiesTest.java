@@ -229,6 +229,26 @@ class JcefApplicationPropertiesTest {
     }
 
     @Test
+    @DisplayName("📦 getJcefDataPath should resolve to 'cef_data' subdirectory")
+    void getJcefDataPath_returnsCorrectPath() {
+        // Arrange: Simulate any OS
+        osIdentifierMock.when(JcefApplicationProperties.OsIdentifier::getOsName).thenReturn("windows");
+        String appData = System.getenv("APPDATA");
+        assumeTrue(appData != null, "APPDATA not set, skipping");
+
+        try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
+            var properties = new JcefApplicationProperties(TEST_APP_NAME, null, "ui");
+            Path expectedPath = Path.of(appData, TEST_APP_NAME, "cef_data");
+
+            // Act
+            var actualPath = properties.getJcefDataPath();
+
+            // Assert
+            assertEquals(expectedPath, actualPath);
+        }
+    }
+
+    @Test
     @DisplayName("🎨 getUiInstallationPath should resolve to 'ui' subdirectory")
     void getUiInstallationPath_returnsCorrectPath() {
         // Arrange: Simulate any OS
