@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("📁  JCEFApplicationProperties Tests")
-class JcefApplicationPropertiesTests {
+class JcefApplicationPropertiesTest {
 
     @Test
     @DisplayName("📦  Distribution classpath defaults to «ui» when blank")

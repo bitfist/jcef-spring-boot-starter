@@ -89,7 +89,7 @@ class MethodInvokingCefQueryHandlerTest {
     }
 
     @Test
-    @DisplayName("✅ Initialize: Should scan and cache beans annotated with @JavaScriptObject")
+    @DisplayName("✅ Initialize: Should scan and cache beans annotated with @TypeScriptObject")
     void initialize_shouldCacheAnnotatedBeans() {
         // This is implicitly tested in the setUp method, but we can add an explicit test.
         // To do this, we'll create a new instance and call initialize manually.

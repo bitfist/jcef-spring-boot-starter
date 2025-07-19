@@ -90,14 +90,10 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (typeScriptGenerator == null) {
-            return false;
-        }
-
         var javascriptObjects = roundEnv.getElementsAnnotatedWith(TypeScriptObject.class);
 
         if (javascriptObjects.isEmpty()) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "No @JavaScriptObject annotations found.");
+            messager.printMessage(Diagnostic.Kind.NOTE, "No @TypeScriptObject annotations found.");
             return false;
         }
 
@@ -116,7 +112,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         for (Element element : javascriptObjects) {
             if (element instanceof TypeElement) {
                 try {
-                    messager.printMessage(Diagnostic.Kind.NOTE, "Processing @JavaScriptObject on " + element.getSimpleName());
+                    messager.printMessage(Diagnostic.Kind.NOTE, "Processing @TypeScriptObject on " + element.getSimpleName());
                     typeScriptGenerator.generate((TypeElement) element);
                 } catch (IOException e) {
                     messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate TypeScript file for " + element.getSimpleName() + ": " + e.getMessage());

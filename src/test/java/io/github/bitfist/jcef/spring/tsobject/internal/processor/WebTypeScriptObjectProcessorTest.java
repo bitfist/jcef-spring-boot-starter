@@ -29,24 +29,24 @@ class WebTypeScriptObjectProcessorTest {
     @TempDir
     Path temporaryOutputDirectory;
 
-    private final JavaFileObject javaScriptConfigAnnotation = JavaFileObjects.forSourceLines(
-            "io.github.bitfist.jcef.spring.javascript.object.JavaScriptConfiguration",
-            "package io.github.bitfist.jcef.spring.javascript.object;",
+    private final JavaFileObject typeScriptConfigurationAnnotation = JavaFileObjects.forSourceLines(
+            "io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration",
+            "package io.github.bitfist.jcef.spring.tsobject;",
             "import java.lang.annotation.*;",
             "@Target(ElementType.TYPE)",
             "@Retention(RetentionPolicy.SOURCE)",
-            "public @interface JavaScriptConfiguration {",
+            "public @interface TypeScriptConfiguration {",
             "    String path() default \"jcef\";",
             "}"
     );
 
-    private final JavaFileObject javaScriptObjectAnnotation = JavaFileObjects.forSourceLines(
-            "io.github.bitfist.jcef.spring.javascript.object.JavaScriptObject",
-            "package io.github.bitfist.jcef.spring.javascript.object;",
+    private final JavaFileObject typeScriptObjectAnnotation = JavaFileObjects.forSourceLines(
+            "io.github.bitfist.jcef.spring.tsobject.TypeScriptObject",
+            "package io.github.bitfist.jcef.spring.tsobject;",
             "import java.lang.annotation.*;",
             "@Target(ElementType.TYPE)",
             "@Retention(RetentionPolicy.SOURCE)",
-            "public @interface JavaScriptObject {}"
+            "public @interface TypeScriptObject {}"
     );
 
     /**
@@ -59,8 +59,8 @@ class WebTypeScriptObjectProcessorTest {
 
         // Combine the mandatory annotations and the test-specific sources into one list.
         var allSources = new ArrayList<JavaFileObject>();
-        allSources.add(javaScriptConfigAnnotation);
-        allSources.add(javaScriptObjectAnnotation);
+        allSources.add(typeScriptConfigurationAnnotation);
+        allSources.add(typeScriptObjectAnnotation);
         allSources.addAll(List.of(sources));
 
         return javac()
@@ -204,12 +204,12 @@ class WebTypeScriptObjectProcessorTest {
     }
 
     @Test
-    @DisplayName("Processor should fail if @JavaScriptObject is used without @JavaScriptConfiguration")
+    @DisplayName("Processor should fail if @TypeScriptObject is used without @TypeScriptConfiguration")
     void process_missingConfiguration_failsCompilation() {
         JavaFileObject brokenService = JavaFileObjects.forSourceLines("com.example.BrokenService",
                 "package com.example;",
                 "import io.github.bitfist.jcef.spring.tsobject.*;",
-                "@TypeScriptObject", // Missing @JavaScriptConfiguration
+                "@TypeScriptObject", // Missing @TypeScriptConfiguration
                 "public class BrokenService {",
                 "    public void doWork() {}",
                 "}"
@@ -219,7 +219,7 @@ class WebTypeScriptObjectProcessorTest {
 
         // Assertions remain the same for compilation failures and errors
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("must also have @JavaScriptConfiguration");
+        assertThat(compilation).hadErrorContaining("must also have @TypeScriptConfiguration");
     }
 
     @Test
@@ -227,7 +227,7 @@ class WebTypeScriptObjectProcessorTest {
     void process_dependencyWithoutConfig_usesPackageAsPath() throws IOException {
         JavaFileObject product = JavaFileObjects.forSourceLines("com.store.inventory.Product",
                 "package com.store.inventory;",
-                // No @JavaScriptConfiguration on this dependency
+                // No @TypeScriptConfiguration on this dependency
                 "public class Product {",
                 "    String sku;",
                 "}"
@@ -280,7 +280,7 @@ class WebTypeScriptObjectProcessorTest {
     @DisplayName("📄➡️ ✅ When class has methods, support files should be copied")
     void when_classHasMethods_then_supportFilesAreCopied() throws IOException, URISyntaxException {
         // --- ARRANGE ---
-        // Create a source file for a class that has a method and is annotated with @JavaScriptObject.
+        // Create a source file for a class that has a method and is annotated with @TypeScriptObject.
         JavaFileObject sourceFileWithMethod = JavaFileObjects.forSourceString("test.MyApiWithMethod", """
                     package test;
                     import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;

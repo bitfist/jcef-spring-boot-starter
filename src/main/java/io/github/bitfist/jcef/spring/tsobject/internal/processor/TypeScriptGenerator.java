@@ -51,7 +51,7 @@ class TypeScriptGenerator {
     }
 
     /**
-     * Retrieves the output path from @JavaScriptConfiguration or returns an empty Optional.
+     * Retrieves the output path from @TypeScriptConfiguration or returns an empty Optional.
      */
     private Optional<String> getOutputPath(Element element) {
         var config = element.getAnnotation(TypeScriptConfiguration.class);
@@ -61,7 +61,7 @@ class TypeScriptGenerator {
     private void generateTypeScriptClass(TypeElement classElement) throws IOException {
         var pathOpt = getOutputPath(classElement);
         if (pathOpt.isEmpty()) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "A class annotated with @JavaScriptObject must also have @JavaScriptConfiguration.", classElement);
+            messager.printMessage(Diagnostic.Kind.ERROR, "A class annotated with @TypeScriptObject must also have @TypeScriptConfiguration.", classElement);
             return;
         }
         var content = buildTypeScriptClass(classElement, pathOpt.get());
