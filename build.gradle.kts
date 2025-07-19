@@ -1,9 +1,11 @@
+import java.net.URI
+
 plugins {
     `java-library`
     alias(libs.plugins.lombok)
     alias(libs.plugins.dependencyManagement)
     alias(libs.plugins.openRewrite)
-    id("io.github.bitfist.github.release")
+    id("io.github.bitfist.gradle-github-support.release")
 }
 
 group = "io.github.bitfist"
@@ -84,5 +86,7 @@ gitHubRelease {
     projectDescription.set("Spring Boot Starter for JCEF")
     developer.set("bitfist")
     licenseFile.set(projectDir.resolve("LICENSE.txt"))
+    license.set("The Apache License, Version 2.0")
+    licenseUri.set(URI("https://www.apache.org/licenses/LICENSE-2.0"))
 }
 
