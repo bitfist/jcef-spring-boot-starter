@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface TypeScriptConfiguration {
 
-    String path() default "jcef";
+    String path() default "";
 }

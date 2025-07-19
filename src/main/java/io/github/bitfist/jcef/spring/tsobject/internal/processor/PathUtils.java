@@ -1,6 +1,5 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -13,22 +12,19 @@ final class PathUtils {
     /**
      * Calculates the relative path to import from a target package to a source package.
      *
-     * @param fromPackage The package of the file needing the import (e.g., "com.app.ui").
-     * @param toPackage   The package of the file to be imported (e.g., "com.app.core").
+     * @param fromPath The path of the file needing the import (e.g., "com/app/ui").
+     * @param toPath   The path of the file to be imported (e.g., "com/app/core").
      * @return The relative path string (e.g., "../core").
      */
-    public static String getRelativePath(String fromPackage, String toPackage) {
-        if (fromPackage.equals(toPackage)) {
+    public static String getRelativePath(String fromPath, String toPath) {
+        if (fromPath.equals(toPath)) {
             return ".";
         }
 
-        Path fromPath = Paths.get(fromPackage.replace('.', '/'));
-        Path toPath = Paths.get(toPackage.replace('.', '/'));
-
-        var relativePath = fromPath.relativize(toPath);
+        var relativePath = Paths.get(fromPath).relativize(Paths.get(toPath));
         var result = relativePath.toString().replace('\\', '/');
 
-        // If the path does not start with '.', it's a subfolder, so prepend './'
+        // If the path does not start with a '.', it's a subfolder, so prepend './'
         if(!result.startsWith(".") && !result.startsWith("/")){
             return "./" + result;
         }

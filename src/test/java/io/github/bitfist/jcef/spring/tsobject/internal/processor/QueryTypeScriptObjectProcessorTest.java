@@ -249,25 +249,6 @@ class QueryTypeScriptObjectProcessorTest {
     }
 
     @Test
-    @DisplayName("Processor should fail if @TypeScriptObject is used without @TypeScriptConfiguration")
-    void process_missingConfiguration_failsCompilation() {
-        JavaFileObject brokenService = JavaFileObjects.forSourceLines("com.example.BrokenService",
-                "package com.example;",
-                "import io.github.bitfist.jcef.spring.tsobject.*;",
-                "@TypeScriptObject", // Missing @TypeScriptConfiguration
-                "public class BrokenService {",
-                "    public void doWork() {}",
-                "}"
-        );
-
-        var compilation = compile(brokenService);
-
-        // Assertions remain the same for compilation failures and errors
-        assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("must also have @TypeScriptConfiguration");
-    }
-
-    @Test
     @DisplayName("Processor should handle dependencies without explicit configuration by using their package name")
     void process_dependencyWithoutConfig_usesPackageAsPath() throws IOException {
         JavaFileObject product = JavaFileObjects.forSourceLines("com.store.inventory.Product",

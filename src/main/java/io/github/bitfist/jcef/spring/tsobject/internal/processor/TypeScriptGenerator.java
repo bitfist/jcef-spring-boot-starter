@@ -3,7 +3,6 @@ package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -14,14 +13,12 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -36,7 +33,6 @@ class TypeScriptGenerator {
     private final String baseOutputPath;
     private final ServiceType serviceType;
     private final Elements elementUtils;
-    private final Messager messager;
     private final TypeConverter typeConverter = new TypeConverter();
     private final Set<String> processedTypes = new HashSet<>();
 
@@ -53,19 +49,22 @@ class TypeScriptGenerator {
     /**
      * Retrieves the output path from @TypeScriptConfiguration or returns an empty Optional.
      */
-    private Optional<String> getOutputPath(Element element) {
+    private String getOutputPath(Element element) {
+        var packagePath = elementUtils.getPackageOf(element).getQualifiedName().toString().replace('.', '/');
         var config = element.getAnnotation(TypeScriptConfiguration.class);
-        return Optional.ofNullable(config).map(TypeScriptConfiguration::path);
+        if (config == null) {
+            return packagePath;
+        }
+        if (config.path().isBlank()) {
+            return packagePath;
+        }
+        return config.path();
     }
 
     private void generateTypeScriptClass(TypeElement classElement) throws IOException {
         var pathOpt = getOutputPath(classElement);
-        if (pathOpt.isEmpty()) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "A class annotated with @TypeScriptObject must also have @TypeScriptConfiguration.", classElement);
-            return;
-        }
-        var content = buildTypeScriptClass(classElement, pathOpt.get());
-        writeFile(classElement, pathOpt.get(), content);
+        var content = buildTypeScriptClass(classElement, pathOpt);
+        writeFile(classElement, pathOpt, content);
     }
 
     private void generateTypeDefinition(TypeElement typeElement) throws IOException {
@@ -73,8 +72,7 @@ class TypeScriptGenerator {
             return;
         }
         // For dependencies, use the configured path or fall back to the Java package name.
-        var path = getOutputPath(typeElement)
-                .orElse(elementUtils.getPackageOf(typeElement).getQualifiedName().toString());
+        var path = getOutputPath(typeElement);
 
         var content = buildTypeScriptDefinition(typeElement, path);
         writeFile(typeElement, path, content);
@@ -169,7 +167,7 @@ class TypeScriptGenerator {
     private void addImports(String tsPath, Set<TypeMirror> dependencies, StringBuilder importsBuilder) {
         for (TypeMirror dep : dependencies) {
             var depElement = ((DeclaredType) dep).asElement();
-            var depPath = getOutputPath(depElement).orElse(elementUtils.getPackageOf(depElement).getQualifiedName().toString());
+            var depPath = getOutputPath(depElement);
             var depName = depElement.getSimpleName().toString();
             var importPath = PathUtils.getRelativePath(tsPath, depPath) + "/" + depName;
             importsBuilder.append("import type { ").append(depName).append(" } from '").append(importPath).append("';\n");

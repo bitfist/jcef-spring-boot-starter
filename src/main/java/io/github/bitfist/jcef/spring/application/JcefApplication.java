@@ -26,7 +26,7 @@ public abstract class JcefApplication {
     /**
      * 🚀 Run the application with custom SpringApplicationBuilder adjustments.
      *
-     * @param clazz Spring Boot annotated main class.
+     * @param clazz Spring Boot annotated application class.
      * @param args Application arguments.
      * @param customizer Callback to tweak the SpringApplicationBuilder.
      */

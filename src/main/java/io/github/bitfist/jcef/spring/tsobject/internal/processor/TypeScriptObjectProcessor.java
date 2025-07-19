@@ -65,7 +65,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
             return;
         }
 
-        this.typeScriptGenerator = new TypeScriptGenerator(outputPath, serviceType, processingEnv.getElementUtils(), messager);
+        this.typeScriptGenerator = new TypeScriptGenerator(outputPath, serviceType, processingEnv.getElementUtils());
     }
 
     @Override

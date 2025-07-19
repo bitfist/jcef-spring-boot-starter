@@ -10,31 +10,31 @@ class PathUtilsTest {
     @Test
     @DisplayName("Should return '.' when packages are the same")
     void getRelativePath_SamePackage() {
-        assertEquals(".", PathUtils.getRelativePath("com.app.ui", "com.app.ui"));
+        assertEquals(".", PathUtils.getRelativePath("com/app/ui", "com/app/ui"));
     }
 
     @Test
     @DisplayName("Should return './core' for a direct sub-package")
     void getRelativePath_ToSubPackage() {
-        assertEquals("./core", PathUtils.getRelativePath("com.app", "com.app.core"));
+        assertEquals("./core", PathUtils.getRelativePath("com/app", "com/app/core"));
     }
 
     @Test
     @DisplayName("Should return '../' for a direct parent package")
     void getRelativePath_ToParentPackage() {
-        assertEquals("..", PathUtils.getRelativePath("com.app.ui", "com.app"));
+        assertEquals("..", PathUtils.getRelativePath("com/app/ui", "com/app"));
     }
 
     @Test
     @DisplayName("Should return '../core' for a sibling package")
     void getRelativePath_ToSiblingPackage() {
-        assertEquals("../core", PathUtils.getRelativePath("com.app.ui", "com.app.core"));
+        assertEquals("../core", PathUtils.getRelativePath("com/app/ui", "com/app/core"));
     }
 
     @Test
     @DisplayName("Should return '../../api/model' for a complex relative path")
     void getRelativePath_ComplexPath() {
-        assertEquals("../../api/model", PathUtils.getRelativePath("com.app.ui.components", "com.app.api.model"));
+        assertEquals("../../api/model", PathUtils.getRelativePath("com/app/ui/components", "com/app/api/model"));
     }
 
     @Test
