@@ -96,10 +96,11 @@ class BrowserAutoConfiguration {
 
     @Bean
     CefClient cefClient(CefApp cefApp, CefQueryHandler messageHandler, List<CefClientCustomizer> cefClientCustomizers) {
+        var client = cefApp.createClient();
+
         CefMessageRouter messageRouter = CefMessageRouter.create();
         messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
 
-        var client = cefApp.createClient();
         client.addMessageRouter(messageRouter);
         cefClientCustomizers.forEach(consumer -> consumer.accept(client));
 
