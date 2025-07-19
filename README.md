@@ -12,6 +12,8 @@ Start with examples on how to use the API, especially the annotations and the cu
 
 Table of contents
 =================
+* [Getting started](#-getting-started)
+* [Configuration](#-configuration)
 * [Examples](#-examples)
   * [Basic Application Bootstrap](#-basic-application-bootstrap)
   * [Executing JavaScript via Annotation](#-executing-javascript-via-annotation)
@@ -22,8 +24,31 @@ Table of contents
   * [Developer options](#-developer-options)
   * [JavaScript Execution](#-javascript-execution)
   * [TypeScript Object](#-typescript-object)
-* [Getting started](#-getting-started)
-* [Configuration](#-configuration)
+---
+
+## 🚀 Getting Started
+
+See the [jcef-gradle-plugin](https://github.com/bitfist/jcef-gradle-plugin) for details on how to get started.
+
+
+---
+
+## ⚙️ Configuration
+
+Example `application.yml`:
+
+```yaml
+jcef:
+  application-name: my-app
+  splash-screen-classpath-resource: splash.png
+  distribution-classpath: ui # classpath to UI files
+  development:
+    show-developer-tools: true
+    debug-port: 9222
+  tsobject:
+    enable-web-communication: true # use REST instead of window.cefQuery(...)
+```
+
 ---
 
 ## 🔍 Examples
@@ -103,25 +128,3 @@ Autoconfiguration for debugging features:
 
 - **@TypeScriptConfiguration** 🎨 Configure TypeScript output path for generated files.
 - **@TypeScriptObject** 🎨 Mark Spring beans as callbacks accessible from JavaScript; triggers TS code generation.
-
----
-
-## 🚀 Getting Started
-
-See the [jcef-gradle-plugin](https://github.com/bitfist/jcef-gradle-plugin) for details on how to get started.
-
----
-
-## ⚙️ Configuration
-
-Example `application.yml`:
-
-```yaml
-jcef:
-  application-name: my-app
-  splash-screen-classpath-resource: splash.png
-  distribution-classpath: ui
-  development:
-    show-developer-tools: true
-    debug-port: 9222
-```
