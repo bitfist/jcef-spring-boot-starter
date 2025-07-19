@@ -58,17 +58,21 @@ public class JcefApplicationProperties {
     public Path getInstallationPath() {
         if (installationPath == null) {
             Path baseDir;
-            if (OsIdentifier.getOsName().contains("win")) {
-                baseDir = Path.of(System.getenv("APPDATA"));
-            } else if (OsIdentifier.getOsName().contains("mac")) {
-                baseDir = Path.of(System.getProperty("user.home"), "Library", "Application Support");
-            } else {
-                String xdg = System.getenv("XDG_DATA_HOME");
-                if (xdg != null && !xdg.isBlank()) {
-                    baseDir = Path.of(xdg);
+            try {
+                if (OsIdentifier.getOsName().contains("win")) {
+                    baseDir = Path.of(System.getenv("APPDATA"));
+                } else if (OsIdentifier.getOsName().contains("mac")) {
+                    baseDir = Path.of(System.getProperty("user.home"), "Library", "Application Support");
                 } else {
-                    baseDir = Path.of(System.getProperty("user.home"), ".local", "share");
+                    String xdg = System.getenv("XDG_DATA_HOME");
+                    if (xdg != null && !xdg.isBlank()) {
+                        baseDir = Path.of(xdg);
+                    } else {
+                        baseDir = Path.of(System.getProperty("user.home"), ".local", "share");
+                    }
                 }
+            } catch (NullPointerException e) {
+                baseDir = Path.of("~");
             }
             installationPath = baseDir.resolve(applicationName);
         }
