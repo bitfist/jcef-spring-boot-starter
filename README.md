@@ -19,8 +19,8 @@ Table of contents
 * [Public Modules](#-public-modules)
   * [Application](#-application)
   * [Browser](#-browser)
-  * [Debug](#-debug)
-  * [JS Execution](#-javascript-execution)
+  * [Developer options](#-developer-options)
+  * [JavaScript Execution](#-javascript-execution)
   * [TypeScript Object](#-typescript-object)
 * [Getting started](#-getting-started)
 * [Configuration](#-configuration)
@@ -87,12 +87,12 @@ All packages under `src/main/java/io/github/bitfist/jcef/spring/` are public API
 - **CefMessageHandler** 📣 Handle incoming CEF queries: `handleQuery(String)`.
 - **CefMessageException** 💥 Exception to signal query errors with code and message.
 
-### 🐞 Debug
+### 🐞 Developer options
 
 Autoconfiguration for debugging features:
 
-- `developerToolsCustomizer()` 🐞 Opens devtools on page load if `jcef.development-options.show-developer-tools=true`.
-- `debugPortCustomizer()` 🐞 Sets remote debugging port via `jcef.development-options.debug-port`.
+- `developerToolsCustomizer()` 🐞 Opens devtools on page load if `jcef.development.show-developer-tools=true`.
+- `debugPortCustomizer()` 🐞 Sets remote debugging port via `jcef.development.debug-port`.
 
 ### ✍️ JavaScript Execution
 
