@@ -155,6 +155,7 @@ class BrowserAutoConfigurationTest {
             // Given
             Path mockPath = Paths.get("test/path");
             when(applicationProperties.getJcefInstallationPath()).thenReturn(mockPath);
+            when(applicationProperties.getJcefDataPath()).thenReturn(Paths.get("test/data"));
 
             CefApplicationCustomizer mockCustomizer = mock(CefApplicationCustomizer.class);
             var customizers = Collections.singletonList(mockCustomizer);
@@ -174,7 +175,7 @@ class BrowserAutoConfigurationTest {
                 assertThat(createdCefApp).isEqualTo(mockCefApp);
 
                 // Verify interactions with the mocked builder
-                var builder = mockedBuilder.constructed().get(0);
+                var builder = mockedBuilder.constructed().getFirst();
                 verify(builder).setInstallDir(mockPath.toFile());
                 verify(builder).setProgressHandler(mockSplashScreen);
                 verify(builder).setAppHandler(any(MavenCefAppHandlerAdapter.class));
