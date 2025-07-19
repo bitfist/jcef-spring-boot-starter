@@ -95,9 +95,14 @@ class BrowserAutoConfiguration {
     }
 
     @Bean
-    CefClient cefClient(CefApp cefApp, List<CefClientCustomizer> cefClientCustomizers) {
+    CefClient cefClient(CefApp cefApp, CefQueryHandler messageHandler, List<CefClientCustomizer> cefClientCustomizers) {
+        CefMessageRouter messageRouter = CefMessageRouter.create();
+        messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
+
         var client = cefApp.createClient();
+        client.addMessageRouter(messageRouter);
         cefClientCustomizers.forEach(consumer -> consumer.accept(client));
+
         return client;
     }
 
@@ -107,15 +112,6 @@ class BrowserAutoConfiguration {
         var browser = client.createBrowser(file.toURI().toString(), false, false);
         cefBrowserCustomizers.forEach(consumer -> consumer.accept(browser));
         return browser;
-    }
-
-    @Bean
-    CefClientCustomizer cefMessageHandlingClientCustomizer(CefQueryHandler messageHandler) {
-        return client -> {
-            CefMessageRouter messageRouter = CefMessageRouter.create();
-            messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
-            client.addMessageRouter(messageRouter);
-        };
     }
 
     // endregion

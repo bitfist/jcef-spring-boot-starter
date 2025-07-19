@@ -6,12 +6,14 @@ import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import me.friwi.jcefmaven.CefAppBuilder;
 import me.friwi.jcefmaven.MavenCefAppHandlerAdapter;
 import org.cef.CefApp;
 import org.cef.CefClient;
 import org.cef.CefSettings;
 import org.cef.browser.CefBrowser;
+import org.cef.browser.CefMessageRouter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -210,20 +213,26 @@ class BrowserAutoConfigurationTest {
         @DisplayName("🖥️ should create CefClient and apply customizers")
         void cefClient_createsAndCustomizes() {
             // Given
-            CefApp mockCefApp = mock(CefApp.class);
-            CefClient mockCefClient = mock(CefClient.class);
-            when(mockCefApp.createClient()).thenReturn(mockCefClient);
+            try (var staticCefMessageRouter = mockStatic(CefMessageRouter.class)) {
+                var cefMessageRouter = mock(CefMessageRouter.class);
+                staticCefMessageRouter.when(CefMessageRouter::create).thenReturn(cefMessageRouter);
+                CefApp mockCefApp = mock(CefApp.class);
+                CefClient mockCefClient = mock(CefClient.class);
+                CefQueryHandler cefQueryHandler = mock(CefQueryHandler.class);
+                when(mockCefApp.createClient()).thenReturn(mockCefClient);
 
-            CefClientCustomizer mockCustomizer = mock(CefClientCustomizer.class);
-            var customizers = Collections.singletonList(mockCustomizer);
+                CefClientCustomizer mockCustomizer = mock(CefClientCustomizer.class);
+                var customizers = Collections.singletonList(mockCustomizer);
 
-            // When
-            var createdClient = browserAutoConfiguration.cefClient(mockCefApp, customizers);
+                // When
+                var createdClient = browserAutoConfiguration.cefClient(mockCefApp, cefQueryHandler, customizers);
 
-            // Then
-            assertThat(createdClient).isEqualTo(mockCefClient);
-            verify(mockCefApp).createClient();
-            verify(mockCustomizer).accept(mockCefClient);
+                // Then
+                assertThat(createdClient).isEqualTo(mockCefClient);
+                verify(mockCefApp).createClient();
+                verify(mockCustomizer).accept(mockCefClient);
+                verify(cefMessageRouter).addHandler(any(DefaultCefMessageRouter.class), eq(true));
+            }
         }
 
         @Test
