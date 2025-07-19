@@ -136,7 +136,7 @@ class JcefApplicationPropertiesTest {
         // Act & Assert
         try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
             var properties = new JcefApplicationProperties(TEST_APP_NAME, null, "ui");
-            Path actualPath = properties.getInstallationPath();
+            var actualPath = properties.getInstallationPath();
             assertEquals(expectedPath, actualPath, "The installation path for Windows is incorrect.");
         }
     }
@@ -152,7 +152,7 @@ class JcefApplicationPropertiesTest {
         // Act & Assert
         try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
             var properties = new JcefApplicationProperties(TEST_APP_NAME, null, "ui");
-            Path actualPath = properties.getInstallationPath();
+            var actualPath = properties.getInstallationPath();
             assertEquals(expectedPath, actualPath, "The installation path for macOS is incorrect.");
         }
     }
@@ -171,7 +171,7 @@ class JcefApplicationPropertiesTest {
         // Act & Assert
         try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
             var properties = new JcefApplicationProperties(TEST_APP_NAME, null, "ui");
-            Path actualPath = properties.getInstallationPath();
+            var actualPath = properties.getInstallationPath();
             assertEquals(expectedPath, actualPath, "The fallback installation path for Linux is incorrect.");
         }
     }
@@ -190,9 +190,9 @@ class JcefApplicationPropertiesTest {
             var properties = new JcefApplicationProperties(TEST_APP_NAME, null, "ui");
 
             // Act: Call the getter multiple times
-            Path path1 = properties.getInstallationPath();
-            Path path2 = properties.getInstallationPath();
-            Path path3 = properties.getInstallationPath();
+            var path1 = properties.getInstallationPath();
+            var path2 = properties.getInstallationPath();
+            var path3 = properties.getInstallationPath();
 
             // Assert: Check that the result is consistent
             assertEquals(path1, path2);
@@ -221,7 +221,7 @@ class JcefApplicationPropertiesTest {
             Path expectedPath = Path.of(appData, TEST_APP_NAME, "bundle");
 
             // Act
-            Path actualPath = properties.getJcefInstallationPath();
+            var actualPath = properties.getJcefInstallationPath();
 
             // Assert
             assertEquals(expectedPath, actualPath);
@@ -241,7 +241,7 @@ class JcefApplicationPropertiesTest {
             Path expectedPath = Path.of(appData, TEST_APP_NAME, "ui");
 
             // Act
-            Path actualPath = properties.getUiInstallationPath();
+            var actualPath = properties.getUiInstallationPath();
 
             // Assert
             assertEquals(expectedPath, actualPath);

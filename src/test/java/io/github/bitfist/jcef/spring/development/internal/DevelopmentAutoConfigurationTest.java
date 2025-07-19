@@ -56,7 +56,7 @@ class DevelopmentAutoConfigurationTest {
         var captor = org.mockito.ArgumentCaptor.forClass(org.cef.handler.CefLoadHandlerAdapter.class);
         verify(client).addLoadHandler(captor.capture());
 
-        CefLoadHandlerAdapter cefLoadHandlerAdapter = captor.getValue();
+        var cefLoadHandlerAdapter = captor.getValue();
         cefLoadHandlerAdapter.onLoadEnd(cefBrowser, null, 0);
     }
 

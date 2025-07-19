@@ -9,7 +9,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
