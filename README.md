@@ -1,5 +1,5 @@
 ![GitHub Release Plugin](https://img.shields.io/static/v1?label=GitHub&message=Release&color=24292e&logo=github)
-[![Gradle build](https://github.com/bitfist/gradle-github-support/actions/workflows/test.yml/badge.svg)](https://github.com/bitfist/jcef-spring-boot-starter/actions/workflows/test.yml)
+[![Gradle build](https://github.com/bitfist/jcef-spring-boot-starter/actions/workflows/test.yml/badge.svg)](https://github.com/bitfist/jcef-spring-boot-starter/actions/workflows/test.yml)
 ![Coverage](.github/badges/jacoco.svg)
 ![Branches](.github/badges/branches.svg)
 
