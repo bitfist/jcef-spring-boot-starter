@@ -2,7 +2,7 @@ package io.github.bitfist.jcef.spring.browser.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
+import io.github.bitfist.jcef.spring.browser.AbstractInstallerSplashScreen;
 import io.github.bitfist.jcef.spring.browser.Browser;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
@@ -39,8 +39,8 @@ class BrowserAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    AbstractSplashScreen progressFrameProvider(JcefApplicationProperties applicationProperties, Optional<BuildProperties> buildProperties) {
-        return new DefaultSplashScreen(applicationProperties, buildProperties.orElse(null));
+    AbstractInstallerSplashScreen progressFrameProvider(JcefApplicationProperties applicationProperties, Optional<BuildProperties> buildProperties) {
+        return new DefaultInstallerSplashScreen(applicationProperties, buildProperties.orElse(null));
     }
 
     @Bean
@@ -68,14 +68,14 @@ class BrowserAutoConfiguration {
     @Bean
     CefApp cefApp(
             ConfigurableApplicationContext applicationContext,
-            AbstractSplashScreen splashScreen,
+            AbstractInstallerSplashScreen installerSplashScreen,
             List<CefApplicationCustomizer> cefApplicationCustomizers
     ) {
         var builder = new CefAppBuilder();
         builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
         builder.getCefSettings().root_cache_path = applicationProperties.getJcefDataPath().toFile().getAbsolutePath();
-        builder.setProgressHandler(splashScreen);
+        builder.setProgressHandler(installerSplashScreen);
         builder.setAppHandler(new MavenCefAppHandlerAdapter() {
             @Override
             public void stateHasChanged(CefApp.CefAppState state) {

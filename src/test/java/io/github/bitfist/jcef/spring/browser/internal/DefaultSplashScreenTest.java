@@ -20,7 +20,7 @@ class DefaultSplashScreenTest {
     void shouldInitializeWithoutSplashAndNoBuildProps() {
         var props = new JcefApplicationProperties("test", null, null);
 
-        assertDoesNotThrow(() -> new DefaultSplashScreen(props, null));
+        assertDoesNotThrow(() -> new DefaultInstallerSplashScreen(props, null));
     }
 
     @Test
@@ -28,7 +28,7 @@ class DefaultSplashScreenTest {
     void shouldInitializeWithInvalidSplashPath() {
         var props = new JcefApplicationProperties("test", "nonexistent/image.png", null);
 
-        assertDoesNotThrow(() -> new DefaultSplashScreen(props, null));
+        assertDoesNotThrow(() -> new DefaultInstallerSplashScreen(props, null));
     }
 
     @Test
@@ -41,7 +41,7 @@ class DefaultSplashScreenTest {
         info.put("time", Instant.now().toString());
         var buildProps = new BuildProperties(info);
 
-        assertDoesNotThrow(() -> new DefaultSplashScreen(props, buildProps));
+        assertDoesNotThrow(() -> new DefaultInstallerSplashScreen(props, buildProps));
     }
 
     @Test
@@ -81,12 +81,12 @@ class DefaultSplashScreenTest {
         assertDoesNotThrow(() -> screen.handleProgress(EnumProgress.INITIALIZING, 0f));
     }
 
-    private DefaultSplashScreen createScreen() {
+    private DefaultInstallerSplashScreen createScreen() {
         var props = new JcefApplicationProperties("test", null, null);
-        return new DefaultSplashScreen(props, null);
+        return new DefaultInstallerSplashScreen(props, null);
     }
 
-    private void hideScreen(DefaultSplashScreen screen) {
+    private void hideScreen(DefaultInstallerSplashScreen screen) {
         screen.handleProgress(EnumProgress.INITIALIZING, 0f);
     }
 }

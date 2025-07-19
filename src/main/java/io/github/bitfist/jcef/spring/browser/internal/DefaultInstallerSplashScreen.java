@@ -1,7 +1,7 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
+import io.github.bitfist.jcef.spring.browser.AbstractInstallerSplashScreen;
 import lombok.SneakyThrows;
 import me.friwi.jcefmaven.EnumProgress;
 import org.jspecify.annotations.Nullable;
@@ -24,12 +24,12 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 /**
  * 📊 Default UI implementation showing JCEF installation progress, with splash image and version overlay.
  */
-class DefaultSplashScreen extends AbstractSplashScreen {
+class DefaultInstallerSplashScreen extends AbstractInstallerSplashScreen {
 
     private final JProgressBar progressBar;
     private final JLabel stateLabel;
 
-    public DefaultSplashScreen(JcefApplicationProperties applicationProperties, @Nullable BuildProperties buildProperties) {
+    public DefaultInstallerSplashScreen(JcefApplicationProperties applicationProperties, @Nullable BuildProperties buildProperties) {
         super("Setup");
         setUndecorated(true);
 

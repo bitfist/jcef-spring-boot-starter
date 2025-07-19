@@ -78,7 +78,7 @@ All packages under `src/main/java/io/github/bitfist/jcef/spring/` are public API
 
 ### 🖥 Browser
 
-- **AbstractSplashScreen** 📦 Base frame for installation progress (implements `IProgressHandler`).
+- **AbstractInstallerSplashScreen** 📦 Base frame for installation progress (implements `IProgressHandler`).
 - **Browser** 🖥 Interface to execute JavaScript: `executeJavaScript(String code)`.
 - **CefApplicationCustomizer** 🔧 Customize the `CefAppBuilder` before initialization.
 - **CefClientCustomizer** 🔧 Customize the `CefClient` (e.g., add message handlers).

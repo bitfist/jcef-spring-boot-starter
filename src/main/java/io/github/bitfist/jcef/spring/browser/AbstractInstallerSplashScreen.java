@@ -11,14 +11,14 @@ import javax.swing.JFrame;
  * See:
  * 🔧 DefaultInstallationProgressFrame for the standard implementation.
  */
-public abstract class AbstractSplashScreen extends JFrame implements IProgressHandler {
+public abstract class AbstractInstallerSplashScreen extends JFrame implements IProgressHandler {
 
     /**
      * 🔨 Construct frame with given window title.
      *
      * @param title Title shown on the frame header.
      */
-    public AbstractSplashScreen(String title) {
+    public AbstractInstallerSplashScreen(String title) {
         super(title);
     }
 

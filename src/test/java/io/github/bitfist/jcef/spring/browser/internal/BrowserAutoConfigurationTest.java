@@ -1,7 +1,7 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.browser.AbstractSplashScreen;
+import io.github.bitfist.jcef.spring.browser.AbstractInstallerSplashScreen;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
@@ -69,7 +69,7 @@ class BrowserAutoConfigurationTest {
             // Then
             assertThat(splashScreen)
                     .isNotNull()
-                    .isInstanceOf(DefaultSplashScreen.class);
+                    .isInstanceOf(DefaultInstallerSplashScreen.class);
         }
 
         @Test
@@ -82,7 +82,7 @@ class BrowserAutoConfigurationTest {
             // Then
             assertThat(splashScreen)
                     .isNotNull()
-                    .isInstanceOf(DefaultSplashScreen.class);
+                    .isInstanceOf(DefaultInstallerSplashScreen.class);
         }
 
         @Test
@@ -143,7 +143,7 @@ class BrowserAutoConfigurationTest {
         @Mock
         private ConfigurableApplicationContext mockApplicationContext;
         @Mock
-        private AbstractSplashScreen mockSplashScreen;
+        private AbstractInstallerSplashScreen mockSplashScreen;
         @Captor
         private ArgumentCaptor<CefApp.CefAppState> stateCaptor;
         @Captor
