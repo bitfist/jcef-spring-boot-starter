@@ -6,6 +6,8 @@ import io.github.bitfist.jcef.spring.development.DevelopmentConfigurationPropert
 import me.friwi.jcefmaven.CefAppBuilder;
 import org.assertj.core.api.Assertions;
 import org.cef.CefSettings;
+import org.cef.browser.CefBrowser;
+import org.cef.handler.CefLoadHandlerAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -46,12 +48,16 @@ class DevelopmentAutoConfigurationTest {
         var cfg = new DevelopmentAutoConfiguration();
         var customizer = cfg.developerToolsCustomizer();
         org.cef.CefClient client = mock(org.cef.CefClient.class);
+        CefBrowser cefBrowser = mock(CefBrowser.class);
 
         customizer.accept(client);
 
         // verify that addLoadHandler was called with a CefLoadHandlerAdapter
         var captor = org.mockito.ArgumentCaptor.forClass(org.cef.handler.CefLoadHandlerAdapter.class);
         verify(client).addLoadHandler(captor.capture());
+
+        CefLoadHandlerAdapter cefLoadHandlerAdapter = captor.getValue();
+        cefLoadHandlerAdapter.onLoadEnd(cefBrowser, null, 0);
     }
 
     @Test

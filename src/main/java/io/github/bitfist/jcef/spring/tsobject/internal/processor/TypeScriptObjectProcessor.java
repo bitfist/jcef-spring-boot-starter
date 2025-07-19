@@ -56,7 +56,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
 
         outputPath = processingEnv.getOptions().get(JCEF_OUTPUT_PATH_OPTION);
         if (outputPath == null || outputPath.isBlank()) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
+            messager.printError("Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
             return;
         }
 

@@ -7,6 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,14 +18,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static io.github.bitfist.jcef.spring.tsobject.internal.processor.TypeScriptObjectProcessor.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class QueryTypeScriptObjectProcessorTest {
 
@@ -54,8 +62,8 @@ class QueryTypeScriptObjectProcessorTest {
      * It combines the necessary annotation definitions with the provided test sources.
      */
     private Compilation compile(JavaFileObject... sources) {
-        var outputPathOption = "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toString();
-        var serviceTypeOption = "-A" + TypeScriptObjectProcessor.JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY;
+        var outputPathOption = "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toString();
+        var serviceTypeOption = "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY;
 
         // Combine the mandatory annotations and the test-specific sources into one list.
         var allSources = new ArrayList<JavaFileObject>();
@@ -67,6 +75,46 @@ class QueryTypeScriptObjectProcessorTest {
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions(outputPathOption, serviceTypeOption)
                 .compile(allSources); // Pass the combined list of sources
+    }
+
+    @Test
+    void init_missingOutputPath_logsMessage() {
+        Messager messager = mock(Messager.class);
+        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
+        when(processingEnvironment.getMessager()).thenReturn(messager);
+
+        new TypeScriptObjectProcessor().init(processingEnvironment);
+
+        verify(messager).printError( "Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
+    }
+
+    @Test
+    void init_missingServiceType_logsMessage() {
+        Messager messager = mock(Messager.class);
+        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
+        when(processingEnvironment.getMessager()).thenReturn(messager);
+        when(processingEnvironment.getOptions()).thenReturn(Map.of(JCEF_OUTPUT_PATH_OPTION, "output"));
+
+        new TypeScriptObjectProcessor().init(processingEnvironment);
+
+        verify(messager).printError("No service type defined. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
+    }
+
+    @Test
+    void init_invalidServiceType_logsMessage() {
+        Messager messager = mock(Messager.class);
+        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
+        when(processingEnvironment.getMessager()).thenReturn(messager);
+        when(processingEnvironment.getOptions()).thenReturn(
+                Map.of(
+                        JCEF_OUTPUT_PATH_OPTION, "output",
+                        JCEF_SERVICE_TYPE_OPTION, "invalid"
+                )
+        );
+
+        new TypeScriptObjectProcessor().init(processingEnvironment);
+
+        verify(messager).printError("Invalid service type: invalid. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
     }
 
     @Test
@@ -298,8 +346,8 @@ class QueryTypeScriptObjectProcessorTest {
         var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions(
-                        "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
-                        "-A" + TypeScriptObjectProcessor.JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
+                        "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
+                        "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
                 )
                 .compile(sourceFileWithMethod);
 
@@ -357,8 +405,8 @@ class QueryTypeScriptObjectProcessorTest {
         var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions(
-                        "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
-                        "-A" + TypeScriptObjectProcessor.JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
+                        "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
+                        "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
                 )
                 .compile(sourceFileWithoutMethod);
 

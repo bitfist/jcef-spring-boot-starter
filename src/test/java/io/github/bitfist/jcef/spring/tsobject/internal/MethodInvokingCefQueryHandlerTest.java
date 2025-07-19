@@ -108,6 +108,11 @@ class MethodInvokingCefQueryHandlerTest {
         assertDoesNotThrow(() -> newHandler.handle(message));
     }
 
+    @Test
+    @DisplayName("✅ Handle Query: Should invoke method with simple parameters and return simple type")
+    void handleQuery_withNullQuery_shouldReturnNull() {
+        assertNull(cefQueryHandler.handleQuery(null));
+    }
 
     @Test
     @DisplayName("✅ Handle Query: Should invoke method with simple parameters and return simple type")
