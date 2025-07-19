@@ -6,7 +6,9 @@
 
 # JCEF Spring Boot Integration
 
-Start with examples on how to use the API, especially the annotations and the customizers.
+This starter aims to integrate [JCEF](https://github.com/jcefmaven/jcefmaven) with
+[Spring Boot](https://spring.io/projects/spring-boot) with additional convenience to make application setup as easy as
+possible.
 
 > [!IMPORTANT]  
 > This project uses dependencies provided from GitHub. You therefore need to set your GitHub user `GPR_USER` and 
