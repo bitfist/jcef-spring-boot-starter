@@ -57,11 +57,10 @@ public class JcefApplicationProperties {
      */
     public Path getInstallationPath() {
         if (installationPath == null) {
-            var os = System.getProperty("os.name").toLowerCase();
             Path baseDir;
-            if (os.contains("win")) {
+            if (OsIdentifier.getOsName().contains("win")) {
                 baseDir = Path.of(System.getenv("APPDATA"));
-            } else if (os.contains("mac")) {
+            } else if (OsIdentifier.getOsName().contains("mac")) {
                 baseDir = Path.of(System.getProperty("user.home"), "Library", "Application Support");
             } else {
                 String xdg = System.getenv("XDG_DATA_HOME");
@@ -97,4 +96,10 @@ public class JcefApplicationProperties {
     }
 
     // endregion
+
+    static class OsIdentifier {
+        static String getOsName() {
+            return System.getProperty("os.name").toLowerCase();
+        }
+    }
 }
