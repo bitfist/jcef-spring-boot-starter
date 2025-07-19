@@ -32,14 +32,14 @@ class UIInstaller {
     }
 
     @PostConstruct
-    private void initialize() {
+    void initialize() {
         installUIResources();
     }
 
     /**
      * ✅ Checks for updates and copies UI resources if needed.
      */
-    public void installUIResources() {
+    private void installUIResources() {
         try {
             var targetBase = properties.getUiInstallationPath();
             var pattern = "classpath*:" + properties.getDistributionClasspath() + "/**/*";

@@ -3,68 +3,77 @@ package io.github.bitfist.jcef.spring.browser.internal;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.Resource;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.net.URL;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@DisplayName("🖼️  UIInstaller Tests")
+/**
+ * Tests for UIInstaller, verifying synchronization of UI resources.
+ */
 class UIInstallerTest {
 
-    /**
-     * Minimal subclass to disable the heavy install process during tests.
-     */
-    static class TestUIInstaller extends UIInstaller {
-        TestUIInstaller(JcefApplicationProperties p) {
-            super(p);
-        }
+    @Mock
+    private JcefApplicationProperties properties;
+    private UIInstaller installer;
 
-        @Override
-        public void installUIResources() {
-        }
+    @TempDir
+    Path tempDir;
 
-        String extractRelativeForTest(Resource r, String p) throws Exception {
-            var m = UIInstaller.class.getDeclaredMethod("extractRelative", Resource.class, String.class);
-            m.setAccessible(true);
-            return (String) m.invoke(this, r, p);
-        }
-
-        boolean isEmptyDirectoryForTest(Path d) throws Exception {
-            var m = UIInstaller.class.getDeclaredMethod("isEmptyDirectory", Path.class);
-            m.setAccessible(true);
-            return (boolean) m.invoke(this, d);
-        }
+    UIInstallerTest() {
+        // Initialize Mockito annotations
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    @DisplayName("🔖  extractRelative strips prefix and leading slash")
-    void whenExtractRelative_thenReturnsRelativePath() throws Exception {
-        var props = new JcefApplicationProperties("app", null, "ui");
-        var installer = new TestUIInstaller(props);
+    @DisplayName("📁 should copy UI resources when installation directory is empty")
+    void shouldCopyResourcesWhenDirectoryEmpty() throws IOException {
+        // Arrange: mock properties to point to a temporary dir and test classpath
+        when(properties.getUiInstallationPath()).thenReturn(tempDir);
+        when(properties.getDistributionClasspath()).thenReturn("ui");
 
-        Resource res = mock(Resource.class);
-        when(res.getURL()).thenReturn(new URL("file:/opt/app/ui/css/style.css"));
-        when(res.getFilename()).thenReturn("style.css");
+        // Prepare installer
+        installer = new UIInstaller(properties);
 
-        assertEquals("css/style.css",
-                installer.extractRelativeForTest(res, "/ui/"));
+        // Act: perform initialization which should install resources
+        installer.initialize();
+
+        // Assert: expected resource (e.g., index.html) exists in the target location
+        Path expected = tempDir.resolve("index.html");
+        assertTrue(Files.exists(expected), "Expected index.html to be copied");
+        assertTrue(Files.size(expected) > 0, "Copied file should not be empty");
     }
 
     @Test
-    @DisplayName("📂  isEmptyDirectory returns true for an empty directory")
-    void whenDirectoryEmpty_thenIsEmptyDirectoryTrue() throws Exception {
-        Path tmp = Files.createTempDirectory("uitest");
-        tmp.toFile().deleteOnExit();
+    @DisplayName("✅ should not copy UI resources when up-to-date")
+    void shouldNotCopyResourcesWhenUpToDate() throws IOException {
+        // Arrange: mock properties
+        when(properties.getUiInstallationPath()).thenReturn(tempDir);
+        when(properties.getDistributionClasspath()).thenReturn("ui");
 
-        var props = new JcefApplicationProperties("app", null, "ui");
-        var installer = new TestUIInstaller(props);
+        // Prepare installer
+        installer = new UIInstaller(properties);
 
-        assertTrue(installer.isEmptyDirectoryForTest(tmp));
+        // Simulate existing file with newer timestamp
+        Path existing = tempDir.resolve("index.html");
+        Files.createDirectories(existing.getParent());
+        String original = "original-content";
+        Files.writeString(existing, original, StandardOpenOption.CREATE);
+        // Set file timestamp ahead of classpath resource
+        existing.toFile().setLastModified(System.currentTimeMillis() + 10_000);
+
+        // Act
+        installer.initialize();
+
+        // Assert: file should remain unchanged
+        String content = Files.readString(existing);
+        assertEquals(original, content, "Existing up-to-date file should not be overwritten");
     }
 }
