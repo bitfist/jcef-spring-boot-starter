@@ -71,7 +71,9 @@ class UIInstaller {
         }
         var prefix = "/" + properties.getDistributionClasspath() + "/";
         for (Resource res : resources) {
-            if (!res.isReadable() || res.getFilename() == null) continue;
+            if (!res.isReadable() || res.getFilename() == null) {
+                continue;
+            }
             var rel = extractRelative(res, prefix);
             var dest = targetBase.resolve(rel);
             var srcTs = res.lastModified();

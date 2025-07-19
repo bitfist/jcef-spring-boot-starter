@@ -74,9 +74,7 @@ class DefaultSplashScreen extends AbstractSplashScreen {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                if (splashImage != null) {
-                    g.drawImage(splashImage, 0, 0, getWidth(), getHeight(), this);
-                }
+                g.drawImage(splashImage, 0, 0, getWidth(), getHeight(), this);
             }
         };
         imagePanel.setLayout(new BorderLayout());
