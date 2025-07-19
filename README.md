@@ -8,6 +8,24 @@
 
 Start with examples on how to use the API, especially the annotations and the customizers.
 
+---
+
+Table of contents
+=================
+* [Examples](#-examples)
+  * [Basic Application Bootstrap](#-basic-application-bootstrap)
+  * [Executing JavaScript via Annotation](#-executing-javascript-via-annotation)
+  * [Marking Beans for TypeScript Generation](#-marking-beans-for-typescript-generation)
+* [Public Modules](#-public-modules)
+  * [Application](#-application)
+  * [Browser](#-browser)
+  * [Debug](#-debug)
+  * [JS Execution](#-javascript-execution)
+  * [TypeScript Object](#-typescript-object)
+* [Getting started](#-getting-started)
+* [Configuration](#-configuration)
+---
+
 ## 🔍 Examples
 
 ### 🚀 Basic Application Bootstrap
@@ -40,6 +58,8 @@ public class MyCallback {
     }
 }
 ```
+
+---
 
 ## 📦 Public Modules
 
@@ -74,19 +94,23 @@ Autoconfiguration for debugging features:
 - `developerToolsCustomizer()` 🐞 Opens devtools on page load if `jcef.development-options.show-developer-tools=true`.
 - `debugPortCustomizer()` 🐞 Sets remote debugging port via `jcef.development-options.debug-port`.
 
-### ✍️ JSExecution
+### ✍️ JavaScript Execution
 
 - **@JavaScriptCode** ✍️ Annotate methods with JS snippets to generate execution code.
 - **JavaScriptExecutor** Interface; default implementation uses `Browser.executeJavaScript`.
 
-### 🎨 TSObject
+### 🎨 TypeScript Object
 
 - **@TypeScriptConfiguration** 🎨 Configure TypeScript output path for generated files.
 - **@TypeScriptObject** 🎨 Mark Spring beans as callbacks accessible from JavaScript; triggers TS code generation.
 
+---
+
 ## 🚀 Getting Started
 
 See the [jcef-gradle-plugin](https://github.com/bitfist/jcef-gradle-plugin) for details on how to get started.
+
+---
 
 ## ⚙️ Configuration
 
@@ -101,7 +125,3 @@ jcef:
     show-developer-tools: true
     debug-port: 9222
 ```
-
-## 📄 License
-
-Apache License 2.0
