@@ -1,6 +1,7 @@
 io.github.bitfist.jcef.spring.application.internal.JcefApplicationAutoConfiguration
 io.github.bitfist.jcef.spring.browser.internal.BrowserAutoConfiguration
 io.github.bitfist.jcef.spring.browser.internal.DevelopmentAutoConfiguration
+io.github.bitfist.jcef.spring.swing.internal.SwingAutoConfiguration
 io.github.bitfist.jcef.spring.tsobject.internal.TypeScriptObjectAutoConfiguration
 io.github.bitfist.jcef.spring.jsexecution.internal.JavaScriptExecutionAutoConfiguration
 

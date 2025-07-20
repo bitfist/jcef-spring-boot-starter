@@ -3,10 +3,8 @@ package io.github.bitfist.jcef.spring.tsobject.internal;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 @AutoConfiguration
-@Import(MethodInvokingRestEndpoint.class)
 class TypeScriptObjectAutoConfiguration {
 
     @Bean

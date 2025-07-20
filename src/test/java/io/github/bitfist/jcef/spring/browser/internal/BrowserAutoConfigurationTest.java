@@ -1,14 +1,15 @@
 package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.browser.AbstractInstallerSplashScreen;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
+import io.github.bitfist.jcef.spring.swing.SwingComponentFactory;
 import me.friwi.jcefmaven.CefAppBuilder;
+import me.friwi.jcefmaven.IProgressHandler;
 import me.friwi.jcefmaven.MavenCefAppHandlerAdapter;
 import org.cef.CefApp;
 import org.cef.CefClient;
@@ -18,7 +19,6 @@ import org.cef.browser.CefMessageRouter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -27,14 +27,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,41 +56,15 @@ class BrowserAutoConfigurationTest {
     @Mock
     private DevelopmentConfigurationProperties developmentProperties;
 
+    @Mock
+    private SwingComponentFactory swingComponentFactory;
+
     @InjectMocks
     private BrowserAutoConfiguration browserAutoConfiguration;
 
     @Nested
     @DisplayName("💧 Bean Creation Tests")
     class BeanCreationTests {
-
-        @Test
-        @DisplayName("✅ should create DefaultSplashScreen with BuildProperties")
-        @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Needs Swing, cannot run in CI")
-        void progressFrameProvider_withBuildProperties() {
-            // Given
-            BuildProperties mockBuildProperties = mock(BuildProperties.class);
-
-            // When
-            var splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.of(mockBuildProperties));
-
-            // Then
-            assertThat(splashScreen)
-                    .isNotNull()
-                    .isInstanceOf(DefaultInstallerSplashScreen.class);
-        }
-
-        @Test
-        @DisplayName("✅ should create DefaultSplashScreen without BuildProperties")
-        @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Needs Swing, cannot run in CI")
-        void progressFrameProvider_withoutBuildProperties() {
-            // When
-            var splashScreen = browserAutoConfiguration.progressFrameProvider(applicationProperties, Optional.empty());
-
-            // Then
-            assertThat(splashScreen)
-                    .isNotNull()
-                    .isInstanceOf(DefaultInstallerSplashScreen.class);
-        }
 
         @Test
         @DisplayName("✅ should create UIInstaller")
@@ -152,7 +124,7 @@ class BrowserAutoConfigurationTest {
         @Mock
         private ConfigurableApplicationContext mockApplicationContext;
         @Mock
-        private AbstractInstallerSplashScreen mockSplashScreen;
+        private IProgressHandler mockSplashScreen;
         @Captor
         private ArgumentCaptor<CefApp.CefAppState> stateCaptor;
         @Captor
@@ -283,8 +255,7 @@ class BrowserAutoConfigurationTest {
 
             // Then
             assertThat(createdBrowser).isEqualTo(mockCefBrowser);
-            String expectedFrontendUri = frontendUri.isBlank() ? BrowserAutoConfiguration.DEFAULT_FRONTEND_URL : frontendUri;
-            verify(mockCefClient).createBrowser(eq(expectedFrontendUri), eq(false), eq(false));
+            verify(mockCefClient).createBrowser(eq(frontendUri), eq(false), eq(false));
             verify(mockCustomizer).accept(mockCefBrowser);
         }
     }

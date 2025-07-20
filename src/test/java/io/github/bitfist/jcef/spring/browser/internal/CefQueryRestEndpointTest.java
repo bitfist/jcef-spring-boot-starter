@@ -1,15 +1,16 @@
-package io.github.bitfist.jcef.spring.tsobject.internal;
+package io.github.bitfist.jcef.spring.browser.internal;
 
+import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class MethodInvokingRestEndpointTest {
+class CefQueryRestEndpointTest {
 
-    private final MethodInvokingCefQueryHandler queryHandler = mock(MethodInvokingCefQueryHandler.class);
+    private final CefQueryHandler queryHandler = mock(CefQueryHandler.class);
 
-    private final MethodInvokingRestEndpoint endpoint = new MethodInvokingRestEndpoint(queryHandler);
+    private final CefQueryRestEndpoint endpoint = new CefQueryRestEndpoint(queryHandler);
 
     @Test
     void shouldInvokeQueryHandler() {

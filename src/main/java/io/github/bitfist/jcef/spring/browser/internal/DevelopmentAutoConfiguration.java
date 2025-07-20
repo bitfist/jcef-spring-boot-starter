@@ -10,6 +10,9 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.swing.SwingUtilities;
 
@@ -22,6 +25,7 @@ import javax.swing.SwingUtilities;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(DevelopmentConfigurationProperties.class)
+@Import(CefQueryRestEndpoint.class)
 class DevelopmentAutoConfiguration {
 
     @Bean
@@ -43,6 +47,21 @@ class DevelopmentAutoConfiguration {
         return builder -> {
             builder.getCefSettings().remote_debugging_port = applicationProperties.getDebugPort();
             builder.addJcefArgs("--remote-allow-origins=*");
+        };
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
+    WebMvcConfigurer corsConfigurer(DevelopmentConfigurationProperties developmentProperties) {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins(developmentProperties.getFrontendUri())
+                        .allowedMethods("POST")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
         };
     }
 }

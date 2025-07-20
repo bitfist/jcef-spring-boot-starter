@@ -2,7 +2,6 @@ package io.github.bitfist.jcef.spring.browser.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bitfist.jcef.spring.application.JcefApplicationProperties;
-import io.github.bitfist.jcef.spring.browser.AbstractInstallerSplashScreen;
 import io.github.bitfist.jcef.spring.browser.Browser;
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
@@ -10,9 +9,12 @@ import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
 import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
+import io.github.bitfist.jcef.spring.swing.SwingComponentFactory;
+import io.github.bitfist.jcef.spring.swing.SwingExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.friwi.jcefmaven.CefAppBuilder;
+import me.friwi.jcefmaven.IProgressHandler;
 import me.friwi.jcefmaven.MavenCefAppHandlerAdapter;
 import org.cef.CefApp;
 import org.cef.CefClient;
@@ -23,12 +25,11 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * 🖥 Auto-configuration for browser components.
@@ -37,17 +38,21 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@Import(SwingComponentFactory.class)
 class BrowserAutoConfiguration {
-
-    static final String DEFAULT_FRONTEND_URL = "http://localhost:3000";
 
     private final JcefApplicationProperties applicationProperties;
     private final DevelopmentConfigurationProperties developmentProperties;
 
     @Bean
     @ConditionalOnMissingBean
-    AbstractInstallerSplashScreen progressFrameProvider(JcefApplicationProperties applicationProperties, Optional<BuildProperties> buildProperties) {
-        return new DefaultInstallerSplashScreen(applicationProperties, buildProperties.orElse(null));
+    IProgressHandler progressFrameProvider(
+            SwingComponentFactory swingComponentFactory,
+            SwingExecutor swingExecutor,
+            JcefApplicationProperties applicationProperties,
+            Optional<BuildProperties> buildProperties
+    ) {
+        return new DefaultInstallerSplashScreen(swingComponentFactory, swingExecutor, applicationProperties, buildProperties.orElse(null));
     }
 
     @Bean
@@ -73,16 +78,12 @@ class BrowserAutoConfiguration {
     }
 
     @Bean
-    CefApp cefApp(
-            ConfigurableApplicationContext applicationContext,
-            AbstractInstallerSplashScreen installerSplashScreen,
-            List<CefApplicationCustomizer> cefApplicationCustomizers
-    ) {
+    CefApp cefApp(ConfigurableApplicationContext applicationContext, IProgressHandler progressHandler, List<CefApplicationCustomizer> cefApplicationCustomizers) {
         var builder = new CefAppBuilder();
         builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
         builder.getCefSettings().windowless_rendering_enabled = false;
         builder.getCefSettings().root_cache_path = applicationProperties.getJcefDataPath().toFile().getAbsolutePath();
-        builder.setProgressHandler(installerSplashScreen);
+        builder.setProgressHandler(progressHandler);
         builder.setAppHandler(new MavenCefAppHandlerAdapter() {
             @Override
             public void stateHasChanged(CefApp.CefAppState state) {
@@ -124,10 +125,7 @@ class BrowserAutoConfiguration {
 
     private URI determineUiUri() {
         if (developmentProperties.isEnableWebCommunication()) {
-            if (isNotBlank(developmentProperties.getFrontendUri())) {
-                return URI.create(developmentProperties.getFrontendUri());
-            }
-            return URI.create(DEFAULT_FRONTEND_URL);
+            return URI.create(developmentProperties.getFrontendUri());
         } else {
             return applicationProperties.getUiInstallationPath().resolve("index.html").toUri();
         }

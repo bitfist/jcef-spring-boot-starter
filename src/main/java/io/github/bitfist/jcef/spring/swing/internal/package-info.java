@@ -1,4 +1,4 @@
 @NonNullApi
-package io.github.bitfist.jcef.spring;
+package io.github.bitfist.jcef.spring.swing.internal;
 
 import org.springframework.lang.NonNullApi;

@@ -27,12 +27,13 @@ dependencies {
     implementation(platform(libs.springModulithBom))
     implementation("org.springframework.modulith:spring-modulith-core")
 
-    compileOnly("org.springframework:spring-web")
+    compileOnly("org.springframework:spring-webmvc")
 
     // region Test
     testImplementation(platform(libs.springModulithBom))
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-webmvc")
     testImplementation(libs.compileTesting)
     testImplementation(libs.googleTruth)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
