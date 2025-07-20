@@ -2,7 +2,7 @@
 import type {ResponseType} from './ResponseType';
 import {ResponseValueConverter} from "./ResponseValueConverter";
 
-export class CefQueryService {
+export class CefCommunicationService {
     static request<T>(
         className: string,
         methodName: string,

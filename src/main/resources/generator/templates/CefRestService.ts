@@ -2,7 +2,7 @@
 import type {ResponseType} from "./ResponseType";
 import {ResponseValueConverter} from "./ResponseValueConverter";
 
-export class CefRestService {
+export class CefCommunicationService {
     static request<T>(className: string, methodName: string, parameters: object, responseType: ResponseType): Promise<any> {
         const targetUrl = '$host:$port/jcef';
 
