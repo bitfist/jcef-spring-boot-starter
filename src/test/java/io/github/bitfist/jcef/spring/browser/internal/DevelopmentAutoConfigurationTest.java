@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,8 +88,8 @@ class DevelopmentAutoConfigurationTest {
     void developerToolsCustomizerRegistersHandler() {
         var cfg = new DevelopmentAutoConfiguration();
         var customizer = cfg.developerToolsCustomizer();
-        org.cef.CefClient client = mock(org.cef.CefClient.class);
-        CefBrowser cefBrowser = mock(CefBrowser.class);
+        var client = mock(org.cef.CefClient.class);
+        var cefBrowser = mock(CefBrowser.class);
 
         customizer.accept(client);
 
@@ -110,7 +109,7 @@ class DevelopmentAutoConfigurationTest {
         var cfg = new DevelopmentAutoConfiguration();
         var customizer = cfg.debugPortCustomizer(props);
 
-        CefAppBuilder builder = mock(CefAppBuilder.class);
+        var builder = mock(CefAppBuilder.class);
         var settings = new CefSettings();
         when(builder.getCefSettings()).thenReturn(settings);
 

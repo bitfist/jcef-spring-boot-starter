@@ -19,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
@@ -88,7 +87,7 @@ class DefaultInstallerSplashScreenTest {
     void testHandleProgressDownloadingWithPercent() {
         splashScreen.handleProgress(EnumProgress.DOWNLOADING, 50f);
 
-        ArgumentCaptor<Runnable> runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
         verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
         runnableArgumentCaptor.getValue().run();
 
@@ -103,7 +102,7 @@ class DefaultInstallerSplashScreenTest {
     void testHandleProgressDownloadingIndeterminate() {
         splashScreen.handleProgress(EnumProgress.DOWNLOADING, -1f);
 
-        ArgumentCaptor<Runnable> runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
         verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
         runnableArgumentCaptor.getValue().run();
 
@@ -117,7 +116,7 @@ class DefaultInstallerSplashScreenTest {
     void testHandleProgressExtracting() {
         splashScreen.handleProgress(EnumProgress.EXTRACTING, 0f);
 
-        ArgumentCaptor<Runnable> runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
         verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
         runnableArgumentCaptor.getValue().run();
 
