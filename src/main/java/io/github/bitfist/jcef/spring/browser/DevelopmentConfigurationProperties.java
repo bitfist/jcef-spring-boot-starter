@@ -1,4 +1,4 @@
-package io.github.bitfist.jcef.spring.development;
+package io.github.bitfist.jcef.spring.browser;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,4 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DevelopmentConfigurationProperties {
     private @Nullable Integer debugPort;
     private boolean showDeveloperTools;
+    private final boolean enableWebCommunication;
+    private @Nullable String frontendUri;
 }

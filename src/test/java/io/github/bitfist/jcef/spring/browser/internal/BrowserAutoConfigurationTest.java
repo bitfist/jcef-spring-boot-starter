@@ -7,6 +7,7 @@ import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
+import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
 import me.friwi.jcefmaven.CefAppBuilder;
 import me.friwi.jcefmaven.MavenCefAppHandlerAdapter;
 import org.cef.CefApp;
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -51,6 +54,9 @@ class BrowserAutoConfigurationTest {
 
     @Mock
     private JcefApplicationProperties applicationProperties;
+
+    @Mock
+    private DevelopmentConfigurationProperties developmentProperties;
 
     @InjectMocks
     private BrowserAutoConfiguration browserAutoConfiguration;
@@ -236,13 +242,13 @@ class BrowserAutoConfigurationTest {
         }
 
         @Test
-        @DisplayName("📄 should create CefBrowser with correct URL and apply customizers")
-        void cefBrowser_createsAndCustomizes() {
+        @DisplayName("📄 should create CefBrowser with correct file URI and apply customizers")
+        void cefBrowser_createsAndCustomizesWithFileUri() {
             // Given
             CefClient mockCefClient = mock(CefClient.class);
             CefBrowser mockCefBrowser = mock(CefBrowser.class);
             Path mockUiPath = Paths.get("test/ui");
-            var expectedFile = mockUiPath.resolve("index.html").toFile();
+            var expectedFile = mockUiPath.resolve("index.html").toAbsolutePath();
 
             when(applicationProperties.getUiInstallationPath()).thenReturn(mockUiPath);
             when(mockCefClient.createBrowser(anyString(), anyBoolean(), anyBoolean())).thenReturn(mockCefBrowser);
@@ -255,7 +261,30 @@ class BrowserAutoConfigurationTest {
 
             // Then
             assertThat(createdBrowser).isEqualTo(mockCefBrowser);
-            verify(mockCefClient).createBrowser(eq(expectedFile.toURI().toString()), eq(false), eq(false));
+            verify(mockCefClient).createBrowser(eq(expectedFile.toUri().toString()), eq(false), eq(false));
+            verify(mockCustomizer).accept(mockCefBrowser);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"", "https://invalid:8000"})
+        @DisplayName("📄 should create CefBrowser with correct web URI and apply customizers")
+        void cefBrowser_createsAndCustomizesWithWebUri(String frontendUri) {
+            // Given
+            CefClient mockCefClient = mock(CefClient.class);
+            CefBrowser mockCefBrowser = mock(CefBrowser.class);
+            CefBrowserCustomizer mockCustomizer = mock(CefBrowserCustomizer.class);
+
+            when(mockCefClient.createBrowser(anyString(), anyBoolean(), anyBoolean())).thenReturn(mockCefBrowser);
+            when(developmentProperties.getFrontendUri()).thenReturn(frontendUri);
+            when(developmentProperties.isEnableWebCommunication()).thenReturn(true);
+
+            // When
+            var createdBrowser = browserAutoConfiguration.cefBrowser(mockCefClient, Collections.singletonList(mockCustomizer));
+
+            // Then
+            assertThat(createdBrowser).isEqualTo(mockCefBrowser);
+            String expectedFrontendUri = frontendUri.isBlank() ? BrowserAutoConfiguration.DEFAULT_FRONTEND_URL : frontendUri;
+            verify(mockCefClient).createBrowser(eq(expectedFrontendUri), eq(false), eq(false));
             verify(mockCustomizer).accept(mockCefBrowser);
         }
     }

@@ -51,7 +51,6 @@ jcef:
   development:
     show-developer-tools: true
     debug-port: 9222
-  tsobject:
     enable-web-communication: true # use REST instead of window.cefQuery(...)
 ```
 

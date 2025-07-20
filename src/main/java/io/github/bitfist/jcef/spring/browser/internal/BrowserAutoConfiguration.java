@@ -9,6 +9,7 @@ import io.github.bitfist.jcef.spring.browser.CefBrowserCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefBrowserFrameCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefQueryHandler;
+import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.friwi.jcefmaven.CefAppBuilder;
@@ -23,8 +24,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * 🖥 Auto-configuration for browser components.
@@ -35,7 +39,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 class BrowserAutoConfiguration {
 
+    static final String DEFAULT_FRONTEND_URL = "http://localhost:3000";
+
     private final JcefApplicationProperties applicationProperties;
+    private final DevelopmentConfigurationProperties developmentProperties;
 
     @Bean
     @ConditionalOnMissingBean
@@ -98,7 +105,8 @@ class BrowserAutoConfiguration {
     CefClient cefClient(CefApp cefApp, CefQueryHandler messageHandler, List<CefClientCustomizer> cefClientCustomizers) {
         var client = cefApp.createClient();
 
-        CefMessageRouter messageRouter = CefMessageRouter.create();
+        // IMPORTANT: the message router must be created AFTER the client, otherwise this call causes a JVM crash
+        var messageRouter = CefMessageRouter.create();
         messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
 
         client.addMessageRouter(messageRouter);
@@ -109,10 +117,20 @@ class BrowserAutoConfiguration {
 
     @Bean
     CefBrowser cefBrowser(CefClient client, List<CefBrowserCustomizer> cefBrowserCustomizers) {
-        var file = applicationProperties.getUiInstallationPath().resolve("index.html").toFile();
-        var browser = client.createBrowser(file.toURI().toString(), false, false);
+        var browser = client.createBrowser(determineUiUri().toString(), false, false);
         cefBrowserCustomizers.forEach(consumer -> consumer.accept(browser));
         return browser;
+    }
+
+    private URI determineUiUri() {
+        if (developmentProperties.isEnableWebCommunication()) {
+            if (isNotBlank(developmentProperties.getFrontendUri())) {
+                return URI.create(developmentProperties.getFrontendUri());
+            }
+            return URI.create(DEFAULT_FRONTEND_URL);
+        } else {
+            return applicationProperties.getUiInstallationPath().resolve("index.html").toUri();
+        }
     }
 
     // endregion

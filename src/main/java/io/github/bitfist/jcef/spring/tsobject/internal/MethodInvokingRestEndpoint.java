@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * A REST endpoint for invoking methods via HTTP POST requests.
  * This controller is activated when the configuration property
- * `jcef.tsobject.enable-web-communication` is set to `true`.
+ * `jcef.development.enable-web-communication` is set to `true`.
  * <p>
  * The endpoint is mapped to the URL path `/jcef`.
  * Incoming requests are processed through the {@link MethodInvokingCefQueryHandler},
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * </ul>
  */
 @Controller
-@ConditionalOnProperty(name = "jcef.tsobject.enable-web-communication", havingValue = "true")
+@ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
 @RequestMapping("/jcef")
 @RequiredArgsConstructor
 class MethodInvokingRestEndpoint {

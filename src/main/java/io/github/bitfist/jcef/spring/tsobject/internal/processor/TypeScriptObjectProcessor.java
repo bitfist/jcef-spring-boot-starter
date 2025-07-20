@@ -1,7 +1,6 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptObject;
-import org.jspecify.annotations.Nullable;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
@@ -28,31 +27,43 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
         "io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration"
 })
 @SupportedOptions({
-        TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION, TypeScriptObjectProcessor.JCEF_SERVICE_TYPE_OPTION,
-        TypeScriptObjectProcessor.JCEF_WEB_HOST_OPTION, TypeScriptObjectProcessor.JCEF_WEB_PORT_OPTION
+        TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION, TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION,
+        TypeScriptObjectProcessor.WEB_BACKEND_HOST_OPTION, TypeScriptObjectProcessor.WEB_BACKEND_PORT_OPTION
 })
 public class TypeScriptObjectProcessor extends AbstractProcessor {
 
-    public static final String JCEF_OUTPUT_PATH_OPTION = "jcef.output.path";
-    public static final String JCEF_SERVICE_TYPE_OPTION = "jcef.output.service.type";
-    public static final String JCEF_WEB_HOST_OPTION = "jcef.output.web.host";
-    public static final String JCEF_WEB_PORT_OPTION = "jcef.output.web.port";
+    static final String JCEF_OUTPUT_PATH_OPTION = "jcef.output.path";
+    static final String JCEF_WEB_COMMUNICATION_ENABLED_OPTION = "jcef.web.communication.enabled";
+    static final String WEB_BACKEND_HOST_OPTION = "jcef.web.backend.host";
+    static final String WEB_BACKEND_PORT_OPTION = "jcef.web.backend.port";
 
-    public static final String JCEF_SERVICE_TYPE_WEB = "web";
-    public static final String JCEF_SERVICE_TYPE_QUERY = "query";
-    public static final String JCEF_WEB_HOST = "http://localhost";
-    public static final String JCEF_WEB_PORT = "8080";
+    static final String DEFAULT_WEB_BACKEND_HOST = "http://localhost";
+    static final String DEFAULT_WEB_BACKEND_PORT = "8080";
 
     private Messager messager;
     private TypeScriptGenerator typeScriptGenerator;
     private boolean supportFilesCopied = false;
     private String outputPath;
-    private ServiceType serviceType;
+    private boolean webCommunicationEnabled = false;
+    private String webBackendHost = DEFAULT_WEB_BACKEND_HOST;
+    private String webBackendPort = DEFAULT_WEB_BACKEND_PORT;
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        var sourceVersions = SourceVersion.values();
+        // return latest version
+        return sourceVersions[sourceVersions.length - 1];
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.messager = processingEnv.getMessager();
+        
+        initializeOptions();
+        if (optionsAreInvalid()) {
+            return;
+        }
 
         outputPath = processingEnv.getOptions().get(JCEF_OUTPUT_PATH_OPTION);
         if (outputPath == null || outputPath.isBlank()) {
@@ -60,32 +71,29 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
             return;
         }
 
-        serviceType = getServiceType(processingEnv);
-        if (serviceType == null) {
-            return;
-        }
-
-        this.typeScriptGenerator = new TypeScriptGenerator(outputPath, serviceType, processingEnv.getElementUtils());
+        this.typeScriptGenerator = new TypeScriptGenerator(outputPath, processingEnv.getElementUtils());
     }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        var sourceVersions = SourceVersion.values();
-        return sourceVersions[sourceVersions.length - 1];
+    
+    private void initializeOptions() {
+        outputPath = processingEnv.getOptions().get(JCEF_OUTPUT_PATH_OPTION);
+        webCommunicationEnabled = Boolean.parseBoolean(processingEnv.getOptions().getOrDefault(JCEF_WEB_COMMUNICATION_ENABLED_OPTION, "false"));
+        webBackendHost = processingEnv.getOptions().getOrDefault(WEB_BACKEND_HOST_OPTION, DEFAULT_WEB_BACKEND_HOST);
+        webBackendPort = processingEnv.getOptions().getOrDefault(WEB_BACKEND_PORT_OPTION, DEFAULT_WEB_BACKEND_PORT);
     }
+    
+    private boolean optionsAreInvalid() {
+        var invalid = false;
 
-    private @Nullable ServiceType getServiceType(ProcessingEnvironment processingEnv) {
-        var serviceType = processingEnv.getOptions().get(JCEF_SERVICE_TYPE_OPTION);
-        if (isBlank(serviceType)) {
-            messager.printError("No service type defined. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
-            return null;
+        if (isBlank(outputPath)) {
+            messager.printError("Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
+            invalid = true;
         }
-        try {
-            return ServiceType.valueOf(serviceType.toUpperCase());
-        } catch (IllegalArgumentException exception) {
-            messager.printError("Invalid service type: " + serviceType + ". Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
-            return null;
+        if (webCommunicationEnabled && (isBlank(webBackendHost) || isBlank(webBackendPort))) {
+            messager.printError("Required options " + WEB_BACKEND_HOST_OPTION + " and " + WEB_BACKEND_PORT_OPTION + " are not set.");
+            invalid = true;
         }
+        
+        return invalid;
     }
 
     @Override
@@ -129,20 +137,17 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
     private void copySupportFiles() throws IOException {
         messager.printMessage(Diagnostic.Kind.NOTE, "Copying CefQueryService.ts and cef.d.ts to output path.");
 
-        String service = serviceType == ServiceType.WEB ? "CefRestService" : "CefQueryService";
-
-
         // Copy service file
-        Path cefQueryServiceDest = Path.of(this.outputPath, "jcef", service + ".ts");
-        if (serviceType == ServiceType.QUERY) {
-            copyFileFromClasspath("generator/templates/CefQueryService.ts", cefQueryServiceDest, Function.identity());
-        } else {
+        Path cefServiceDest = Path.of(this.outputPath, "jcef", TypeScriptGenerator.CEF_COMMUNICATION_SERVICE_NAME + ".ts");
+        if (webCommunicationEnabled) {
             Function<String, String> processor = content -> {
-                content = content.replace("$host", processingEnv.getOptions().getOrDefault(JCEF_WEB_HOST_OPTION, JCEF_WEB_HOST));
-                content = content.replace("$port", processingEnv.getOptions().getOrDefault(JCEF_WEB_PORT_OPTION, JCEF_WEB_PORT));
+                content = content.replace("$host", processingEnv.getOptions().getOrDefault(WEB_BACKEND_HOST_OPTION, DEFAULT_WEB_BACKEND_HOST));
+                content = content.replace("$port", processingEnv.getOptions().getOrDefault(WEB_BACKEND_PORT_OPTION, DEFAULT_WEB_BACKEND_PORT));
                 return content;
             };
-            copyFileFromClasspath("generator/templates/CefRestService.ts", cefQueryServiceDest, processor);
+            copyFileFromClasspath("generator/templates/CefRestService.ts", cefServiceDest, processor);
+        } else {
+            copyFileFromClasspath("generator/templates/CefQueryService.ts", cefServiceDest, Function.identity());
         }
 
         copyFileFromClasspath("generator/templates/ResponseValueConverter.ts", Path.of(this.outputPath, "jcef", "ResponseValueConverter.ts"), Function.identity());

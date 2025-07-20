@@ -2,6 +2,7 @@ package io.github.bitfist.jcef.spring;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.modulith.Modulith;
 import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.modulith.docs.Documenter;
@@ -19,6 +20,7 @@ public class Architecture {
 
     @Test
     @DisplayName("📝 Write documentation")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Unnecessary in CI")
     void writeDocumentation() {
         new Documenter(applicationModules)
                 .writeModulesAsPlantUml()

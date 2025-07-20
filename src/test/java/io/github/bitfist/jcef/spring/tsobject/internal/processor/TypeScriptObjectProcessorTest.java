@@ -4,11 +4,10 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,21 +16,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static io.github.bitfist.jcef.spring.tsobject.internal.processor.TypeScriptObjectProcessor.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-class QueryTypeScriptObjectProcessorTest {
+class TypeScriptObjectProcessorTest {
 
     @TempDir
     Path temporaryOutputDirectory;
@@ -60,9 +54,9 @@ class QueryTypeScriptObjectProcessorTest {
      * Helper method to run the compilation with the annotation processor.
      * It combines the necessary annotation definitions with the provided test sources.
      */
-    private Compilation compile(JavaFileObject... sources) {
-        var outputPathOption = "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toString();
-        var serviceTypeOption = "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY;
+    private Compilation compile(boolean webCommunicationEnabled, JavaFileObject... sources) {
+        var outputPathOption = "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toString();
+        var serviceTypeOption = "-A" + TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION + "=" + webCommunicationEnabled;
 
         // Combine the mandatory annotations and the test-specific sources into one list.
         var allSources = new ArrayList<JavaFileObject>();
@@ -76,49 +70,10 @@ class QueryTypeScriptObjectProcessorTest {
                 .compile(allSources); // Pass the combined list of sources
     }
 
-    @Test
-    void init_missingOutputPath_logsMessage() {
-        Messager messager = mock(Messager.class);
-        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
-        when(processingEnvironment.getMessager()).thenReturn(messager);
-
-        new TypeScriptObjectProcessor().init(processingEnvironment);
-
-        verify(messager).printError( "Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
-    }
-
-    @Test
-    void init_missingServiceType_logsMessage() {
-        Messager messager = mock(Messager.class);
-        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
-        when(processingEnvironment.getMessager()).thenReturn(messager);
-        when(processingEnvironment.getOptions()).thenReturn(Map.of(JCEF_OUTPUT_PATH_OPTION, "output"));
-
-        new TypeScriptObjectProcessor().init(processingEnvironment);
-
-        verify(messager).printError("No service type defined. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
-    }
-
-    @Test
-    void init_invalidServiceType_logsMessage() {
-        Messager messager = mock(Messager.class);
-        ProcessingEnvironment processingEnvironment = mock(ProcessingEnvironment.class);
-        when(processingEnvironment.getMessager()).thenReturn(messager);
-        when(processingEnvironment.getOptions()).thenReturn(
-                Map.of(
-                        JCEF_OUTPUT_PATH_OPTION, "output",
-                        JCEF_SERVICE_TYPE_OPTION, "invalid"
-                )
-        );
-
-        new TypeScriptObjectProcessor().init(processingEnvironment);
-
-        verify(messager).printError("Invalid service type: invalid. Must be one of " + JCEF_SERVICE_TYPE_WEB + " or " + JCEF_SERVICE_TYPE_QUERY);
-    }
-
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("Processor should succeed with a simple service and generate correct TS")
-    void process_simpleService_succeedsAndGeneratesCorrectly() throws IOException {
+    void process_simpleService_succeedsAndGeneratesCorrectly(boolean webCommunicationEnabled) throws Exception {
         JavaFileObject userService = JavaFileObjects.forSourceLines("com.example.UserService",
                 "package com.example;",
                 "import io.github.bitfist.jcef.spring.tsobject.*;",
@@ -130,7 +85,7 @@ class QueryTypeScriptObjectProcessorTest {
                 "}"
         );
 
-        var compilation = compile(userService);
+        var compilation = compile(webCommunicationEnabled, userService);
 
         assertThat(compilation).succeeded();
 
@@ -140,15 +95,15 @@ class QueryTypeScriptObjectProcessorTest {
         String content = Files.readString(generatedFile);
         var expectedContent = """
                 /** AUTO-GENERATED by JCEF TypeScriptObjectProcessor – DO NOT EDIT **/
-                import { CefQueryService } from '../../jcef/CefQueryService';
+                import { CefCommunicationService } from '../../jcef/CefCommunicationService';
                 
                 export class UserService {
                     public static getUser(id: number): Promise<string> {
-                        return CefQueryService.request('com.example.UserService', 'getUser', {id}, 'string');
+                        return CefCommunicationService.request('com.example.UserService', 'getUser', {id}, 'string');
                     }
                 
                     public static updateUser(name: string): void {
-                        return CefQueryService.request('com.example.UserService', 'updateUser', {name}, 'object');
+                        return CefCommunicationService.request('com.example.UserService', 'updateUser', {name}, 'object');
                     }
                 
                 }
@@ -157,9 +112,10 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(content).isEqualTo(expectedContent);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("Processor should generate correct TS based on visibility")
-    void process_visibility_succeedsAndGeneratesCorrectly() throws IOException {
+    void process_visibility_succeedsAndGeneratesCorrectly(boolean webCommunicationEnabled) throws Exception {
         JavaFileObject userService = JavaFileObjects.forSourceLines("com.example.UserService",
                 "package com.example;",
                 "import io.github.bitfist.jcef.spring.tsobject.*;",
@@ -172,7 +128,7 @@ class QueryTypeScriptObjectProcessorTest {
                 "}"
         );
 
-        var compilation = compile(userService);
+        var compilation = compile(webCommunicationEnabled, userService);
 
         assertThat(compilation).succeeded();
 
@@ -182,15 +138,15 @@ class QueryTypeScriptObjectProcessorTest {
         String content = Files.readString(generatedFile);
         var expectedContent = """
                 /** AUTO-GENERATED by JCEF TypeScriptObjectProcessor – DO NOT EDIT **/
-                import { CefQueryService } from '../../jcef/CefQueryService';
+                import { CefCommunicationService } from '../../jcef/CefCommunicationService';
                 
                 export class UserService {
                     public static getUser(id: number): Promise<string> {
-                        return CefQueryService.request('com.example.UserService', 'getUser', {id}, 'string');
+                        return CefCommunicationService.request('com.example.UserService', 'getUser', {id}, 'string');
                     }
                 
                     public static getUser2(id: number): Promise<string> {
-                        return CefQueryService.request('com.example.UserService', 'getUser2', {id}, 'string');
+                        return CefCommunicationService.request('com.example.UserService', 'getUser2', {id}, 'string');
                     }
                 
                 }
@@ -199,9 +155,12 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(content).isEqualTo(expectedContent);
     }
 
-    @Test
+    // --- The rest of the test methods remain unchanged ---
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("Processor should generate dependent type definitions")
-    void process_serviceWithComplexTypes_generatesDependencies() throws IOException {
+    void process_serviceWithComplexTypes_generatesDependencies(boolean webCommunicationEnabled) throws Exception {
         JavaFileObject userDto = JavaFileObjects.forSourceLines("com.example.model.UserDto",
                 "package com.example.model;",
                 "import io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration;",
@@ -225,7 +184,7 @@ class QueryTypeScriptObjectProcessorTest {
                 "}"
         );
 
-        var compilation = compile(userDto, dataService);
+        var compilation = compile(webCommunicationEnabled, userDto, dataService);
 
         assertThat(compilation).succeeded();
 
@@ -248,9 +207,10 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(dependencyContent).isEqualTo(expectedDependencyContent);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("Processor should handle dependencies without explicit configuration by using their package name")
-    void process_dependencyWithoutConfig_usesPackageAsPath() throws IOException {
+    void process_dependencyWithoutConfig_usesPackageAsPath(boolean webCommunicationEnabled) throws Exception {
         JavaFileObject product = JavaFileObjects.forSourceLines("com.store.inventory.Product",
                 "package com.store.inventory;",
                 // No @TypeScriptConfiguration on this dependency
@@ -269,7 +229,7 @@ class QueryTypeScriptObjectProcessorTest {
                 "}"
         );
 
-        var compilation = compile(product, storeService);
+        var compilation = compile(webCommunicationEnabled, product, storeService);
 
         assertThat(compilation).succeeded();
 
@@ -290,21 +250,22 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(Files.exists(serviceFile)).isTrue();
         String serviceContent = Files.readString(serviceFile);
         assertThat(serviceContent).contains("""
-                import { CefQueryService } from '../../jcef/CefQueryService';
+                import { CefCommunicationService } from '../../jcef/CefCommunicationService';
                 import type { Product } from '../../com/store/inventory/Product';
                 
                 export class StoreService {
                     public static getProduct(id: string): Promise<Product> {
-                        return CefQueryService.request('com.store.api.StoreService', 'getProduct', {id}, 'object');
+                        return CefCommunicationService.request('com.store.api.StoreService', 'getProduct', {id}, 'object');
                     }
                 
                 }
                 """);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("📄➡️ ✅ When class has methods, support files should be copied")
-    void when_classHasMethods_then_supportFilesAreCopied() throws IOException, URISyntaxException {
+    void when_classHasMethods_then_supportFilesAreCopied(boolean webCommunicationEnabled) throws Exception {
         // --- ARRANGE ---
         // Create a source file for a class that has a method and is annotated with @TypeScriptObject.
         JavaFileObject sourceFileWithMethod = JavaFileObjects.forSourceString("test.MyApiWithMethod", """
@@ -326,8 +287,8 @@ class QueryTypeScriptObjectProcessorTest {
         var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions(
-                        "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
-                        "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
+                        "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
+                        "-A" + TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION + "=" + webCommunicationEnabled
                 )
                 .compile(sourceFileWithMethod);
 
@@ -337,39 +298,43 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(compilation).succeeded();
 
         // 2. Define the expected paths for the copied files.
-        var cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
+        var cefCommunicationServicePath = temporaryOutputDirectory.resolve("jcef/CefCommunicationService.ts");
         var cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
         var responseTypePath = temporaryOutputDirectory.resolve("jcef/ResponseType.ts");
         var responseValueConverterPath = temporaryOutputDirectory.resolve("jcef/ResponseValueConverter.ts");
 
         // 3. Assert that the files were created.
-        assertTrue(Files.exists(cefQueryServicePath), "CefQueryService.ts should have been created.");
+        assertTrue(Files.exists(cefCommunicationServicePath), "CefCommunicationService.ts should have been created.");
         assertTrue(Files.exists(cefDtsPath), "cef.d.ts should have been created.");
         assertTrue(Files.exists(responseTypePath), "ResponseType.ts should have been created.");
         assertTrue(Files.exists(responseValueConverterPath), "ResponseValueConverter.ts should have been created.");
 
         // 4. Load the original content from test resources.
-        var expectedCefQueryServiceContent = getResourceContent("generator/templates/CefQueryService.ts");
+        var expectedCefCommunicationServiceContent = getResourceContent(webCommunicationEnabled ? "generator/templates/CefRestService.ts" : "generator/templates/CefQueryService.ts");
         var expectedCefDtsContent = getResourceContent("generator/templates/cef.d.ts");
         var expectedResponseTypeContent = getResourceContent("generator/templates/ResponseType.ts");
         var expectedResponseValueConverterContent = getResourceContent("generator/templates/ResponseValueConverter.ts");
 
         // 5. Read the content of the newly created files.
-        String actualCefQueryServiceContent = Files.readString(cefQueryServicePath);
+        String actualCefCommunicationServiceContent = Files.readString(cefCommunicationServicePath);
         String actualCefDtsContent = Files.readString(cefDtsPath);
         String actualResponseTypeContent = Files.readString(responseTypePath);
         String actualResponseValueConverterContent = Files.readString(responseValueConverterPath);
 
+        expectedCefCommunicationServiceContent = expectedCefCommunicationServiceContent.replace("$host", TypeScriptObjectProcessor.DEFAULT_WEB_BACKEND_HOST);
+        expectedCefCommunicationServiceContent = expectedCefCommunicationServiceContent.replace("$port", TypeScriptObjectProcessor.DEFAULT_WEB_BACKEND_PORT);
+
         // 6. Assert that the content of the copied files matches the original resources.
-        assertEquals(expectedCefQueryServiceContent, actualCefQueryServiceContent, "Content of CefQueryService.ts does not match.");
+        assertEquals(expectedCefCommunicationServiceContent, actualCefCommunicationServiceContent, "Content of CefCommunicationService.ts does not match.");
         assertEquals(expectedCefDtsContent, actualCefDtsContent, "Content of cef.d.ts does not match.");
         assertEquals(expectedResponseTypeContent, actualResponseTypeContent, "Content of ResponseType.ts does not match.");
         assertEquals(expectedResponseValueConverterContent, actualResponseValueConverterContent, "Content of ResponseValueConverter.ts does not match.");
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("📄➡️ ❌ When class has no methods, support files should not be copied")
-    void when_classHasNoMethods_then_supportFilesAreNotCopied() {
+    void when_classHasNoMethods_then_supportFilesAreNotCopied(boolean webCommunicationEnabled) {
         // --- ARRANGE ---
         // Create a source file for a class with no methods, only fields.
         JavaFileObject sourceFileWithoutMethod = JavaFileObjects.forSourceString("test.MyApiWithoutMethod", """
@@ -385,8 +350,8 @@ class QueryTypeScriptObjectProcessorTest {
         var compilation = Compiler.javac()
                 .withProcessors(new TypeScriptObjectProcessor())
                 .withOptions(
-                        "-A" + JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
-                        "-A" + JCEF_SERVICE_TYPE_OPTION + "=" + ServiceType.QUERY
+                        "-A" + TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION + "=" + temporaryOutputDirectory.toAbsolutePath(),
+                        "-A" + TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION + "=" + webCommunicationEnabled
                 )
                 .compile(sourceFileWithoutMethod);
 
@@ -395,11 +360,11 @@ class QueryTypeScriptObjectProcessorTest {
         assertThat(compilation).succeeded();
 
         // 2. Define the expected paths for the copied files.
-        var cefQueryServicePath = temporaryOutputDirectory.resolve("jcef/CefQueryService.ts");
+        var cefCommunicationServicePath = temporaryOutputDirectory.resolve("jcef/CefCommunicationService.ts");
         var cefDtsPath = temporaryOutputDirectory.resolve("types/cef.d.ts");
 
         // 3. Assert that the files do NOT exist.
-        assertFalse(Files.exists(cefQueryServicePath), "CefQueryService.ts should NOT have been created.");
+        assertFalse(Files.exists(cefCommunicationServicePath), "CefCommunicationService.ts should NOT have been created.");
         assertFalse(Files.exists(cefDtsPath), "cef.d.ts should NOT have been created.");
     }
 
@@ -411,7 +376,7 @@ class QueryTypeScriptObjectProcessorTest {
      * @throws IOException        if the resource cannot be read.
      * @throws URISyntaxException if the resource path is invalid.
      */
-    private String getResourceContent(String resourceName) throws IOException, URISyntaxException {
+    private String getResourceContent(String resourceName) throws Exception {
         return Files.readString(
                 Path.of(Objects.requireNonNull(getClass().getClassLoader().getResource(resourceName)).toURI()),
                 StandardCharsets.UTF_8

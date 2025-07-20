@@ -1,8 +1,8 @@
-package io.github.bitfist.jcef.spring.development.internal;
+package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
-import io.github.bitfist.jcef.spring.development.DevelopmentConfigurationProperties;
+import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;

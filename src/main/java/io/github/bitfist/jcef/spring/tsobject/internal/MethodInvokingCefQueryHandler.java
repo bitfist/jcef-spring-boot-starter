@@ -12,8 +12,8 @@ import org.jspecify.annotations.Nullable;
 @RequiredArgsConstructor
 class MethodInvokingCefQueryHandler implements CefQueryHandler {
 
-    private static final int JSON_MESSAGE_PROCESSING_ERROR = 1001;
-    private static final int JSON_RETURN_VALUE_PROCESSING_ERROR = 1002;
+    static final int JSON_MESSAGE_PROCESSING_ERROR = 1001;
+    static final int JSON_RETURN_VALUE_PROCESSING_ERROR = 1002;
 
     private final MethodInvokingCefMessageHandler messageHandler;
     private final ObjectMapper objectMapper = new ObjectMapper();

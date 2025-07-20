@@ -1,18 +1,17 @@
-package io.github.bitfist.jcef.spring.development.internal;
+package io.github.bitfist.jcef.spring.browser.internal;
 
 import io.github.bitfist.jcef.spring.browser.CefApplicationCustomizer;
 import io.github.bitfist.jcef.spring.browser.CefClientCustomizer;
-import io.github.bitfist.jcef.spring.development.DevelopmentConfigurationProperties;
+import io.github.bitfist.jcef.spring.browser.DevelopmentConfigurationProperties;
 import me.friwi.jcefmaven.CefAppBuilder;
-import org.assertj.core.api.Assertions;
 import org.cef.CefSettings;
 import org.cef.browser.CefBrowser;
-import org.cef.handler.CefLoadHandlerAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -23,7 +22,7 @@ class DevelopmentAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(DevelopmentAutoConfiguration.class))
             .withBean(DevelopmentConfigurationProperties.class, () ->
-                    new DevelopmentConfigurationProperties(null, false)
+                    new DevelopmentConfigurationProperties(null, false, false, null)
             );
 
     @Test
@@ -31,7 +30,7 @@ class DevelopmentAutoConfigurationTest {
     void developerToolsCustomizerLoaded() {
         contextRunner
                 .withPropertyValues("jcef.development.show-developer-tools=true")
-                .run(context -> Assertions.assertThat(context).hasSingleBean(CefClientCustomizer.class));
+                .run(context -> assertThat(context).hasSingleBean(CefClientCustomizer.class));
     }
 
     @Test
@@ -39,7 +38,7 @@ class DevelopmentAutoConfigurationTest {
     void developerToolsCustomizerNotLoaded() {
         contextRunner
                 // no property set → bean should not be created
-                .run(context -> Assertions.assertThat(context).doesNotHaveBean(CefClientCustomizer.class));
+                .run(context -> assertThat(context).doesNotHaveBean(CefClientCustomizer.class));
     }
 
     @Test
@@ -64,7 +63,7 @@ class DevelopmentAutoConfigurationTest {
     @DisplayName("🛠️ debugPortCustomizer sets port and adds args")
     void debugPortCustomizerSetsPortAndArgs() {
         // simulate having debug-port property
-        var props = new DevelopmentConfigurationProperties(5555, false);
+        var props = new DevelopmentConfigurationProperties(5555, false, false, null);
         var cfg = new DevelopmentAutoConfiguration();
         var customizer = cfg.debugPortCustomizer(props);
 
@@ -86,6 +85,6 @@ class DevelopmentAutoConfigurationTest {
         contextRunner
                 // only show-developer-tools, no debug-port
                 .withPropertyValues("jcef.development.show-developer-tools=true")
-                .run(context -> Assertions.assertThat(context).doesNotHaveBean(CefApplicationCustomizer.class));
+                .run(context -> assertThat(context).doesNotHaveBean(CefApplicationCustomizer.class));
     }
 }

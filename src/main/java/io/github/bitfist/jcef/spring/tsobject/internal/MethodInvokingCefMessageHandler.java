@@ -18,9 +18,9 @@ import static io.github.bitfist.jcef.spring.tsobject.internal.MethodInvokingCefQ
 @RequiredArgsConstructor
 class MethodInvokingCefMessageHandler {
 
-    private static final int JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT = 2001;
-    private static final int JAVA_METHOD_NOT_FOUND = 2002;
-    private static final int JAVA_CLASS_NOT_FOUND = 2003;
+    static final int JAVA_OBJECT_NOT_REGISTERED_AS_JAVASCRIPT_OBJECT = 2001;
+    static final int JAVA_METHOD_NOT_FOUND = 2002;
+    static final int JAVA_CLASS_NOT_FOUND = 2003;
 
     private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper = new ObjectMapper();

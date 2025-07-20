@@ -143,7 +143,7 @@ class JavaScriptCodeAnnotationProcessorTest {
     void shouldReportErrorForAnnotationOnClass() {
         JavaFileObject invalidUsage = JavaFileObjects.forSourceString("test.InvalidUsage", """
                     package test;
-                    import io.github.bitfist.jcef.spring.javascript.execution.JavaScriptCode;
+                    import io.github.bitfist.jcef.spring.jsexecution.JavaScriptCode;
                 
                     @JavaScriptCode("class-level code")
                     public class InvalidUsage {
@@ -157,9 +157,31 @@ class JavaScriptCodeAnnotationProcessorTest {
                 .withProcessors(new JavaScriptCodeAnnotationProcessor())
                 .compile(invalidUsage);
 
+        assertThat(compilation).failed();
+    }
+
+    @Test
+    @DisplayName("⚠️ Should report error for annotation on class")
+    void shouldReportErrorForNonVoidReturnTypeClass() {
+        JavaFileObject invalidUsage = JavaFileObjects.forSourceString("test.InvalidUsage", """
+                    package test;
+                    import io.github.bitfist.jcef.spring.jsexecution.JavaScriptCode;
+                
+                    public class InvalidUsage {
+                        @JavaScriptCode("class-level code")
+                        String someMethod() {
+                            return "";
+                        }
+                    }
+                """);
+
+        var compilation = javac()
+                .withProcessors(new JavaScriptCodeAnnotationProcessor())
+                .compile(invalidUsage);
+
         // This should not fail the compilation, but the processor should not generate any file.
         assertThat(compilation).failed();
-//        assertThat(compilation).generatedSourceFileCount().isEqualTo(0);
+        assertThat(compilation).hadErrorContaining("JavaScriptCode annotation is only supported on void methods.");
     }
 
     @Test
@@ -167,7 +189,7 @@ class JavaScriptCodeAnnotationProcessorTest {
     void shouldHandleReturnTypes() {
         JavaFileObject userInterface = JavaFileObjects.forSourceString("test.UserInterface", """
                     package test;
-                    import io.github.bitfist.jcef.spring.javascript.execution.JavaScriptCode;
+                    import io.github.bitfist.jcef.spring.jsexecution.JavaScriptCode;
                 
                     public interface UserInterface {
                         @JavaScriptCode("return 1;")
