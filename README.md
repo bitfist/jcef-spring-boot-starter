@@ -52,6 +52,7 @@ jcef:
     show-developer-tools: true
     debug-port: 9222
     enable-web-communication: true # use REST instead of window.cefQuery(...)
+    frontend-uri: "http://localhost:3000"
 ```
 
 ---
