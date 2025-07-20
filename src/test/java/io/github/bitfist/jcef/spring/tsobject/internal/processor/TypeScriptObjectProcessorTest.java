@@ -114,6 +114,37 @@ class TypeScriptObjectProcessorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    @DisplayName("Processor should succeed with a simple service and generate correct TS")
+    void process_invalidAnnotationProcessorOptions_fails(boolean webCommunicationEnabled) throws Exception {
+        JavaFileObject userService = JavaFileObjects.forSourceLines("com.example.UserService",
+                "package com.example;",
+                "import io.github.bitfist.jcef.spring.tsobject.*;",
+                "@TypeScriptObject",
+                "@TypeScriptConfiguration(path = \"api/services\")",
+                "public class UserService {",
+                "    public String getUser(int id) { return \"User \" + id; }",
+                "    public void updateUser(String name) { }",
+                "}"
+        );
+
+        var serviceTypeOption = "-A" + TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION + "=" + webCommunicationEnabled;
+
+        var allSources = new ArrayList<JavaFileObject>();
+        allSources.add(typeScriptConfigurationAnnotation);
+        allSources.add(typeScriptObjectAnnotation);
+        allSources.add(userService);
+
+        var compilation = javac()
+                .withProcessors(new TypeScriptObjectProcessor())
+                .withOptions(serviceTypeOption)
+                .compile(allSources);
+
+        assertThat(compilation).failed();
+        assertThat(compilation).hadErrorContaining(TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("Processor should generate correct TS based on visibility")
     void process_visibility_succeedsAndGeneratesCorrectly(boolean webCommunicationEnabled) throws Exception {
         JavaFileObject userService = JavaFileObjects.forSourceLines("com.example.UserService",
@@ -321,8 +352,7 @@ class TypeScriptObjectProcessorTest {
         String actualResponseTypeContent = Files.readString(responseTypePath);
         String actualResponseValueConverterContent = Files.readString(responseValueConverterPath);
 
-        expectedCefCommunicationServiceContent = expectedCefCommunicationServiceContent.replace("$host", TypeScriptObjectProcessor.DEFAULT_WEB_BACKEND_HOST);
-        expectedCefCommunicationServiceContent = expectedCefCommunicationServiceContent.replace("$port", TypeScriptObjectProcessor.DEFAULT_WEB_BACKEND_PORT);
+        expectedCefCommunicationServiceContent = expectedCefCommunicationServiceContent.replace("$backendUri", TypeScriptObjectProcessor.DEFAULT_WEB_BACKEND_URI);
 
         // 6. Assert that the content of the copied files matches the original resources.
         assertEquals(expectedCefCommunicationServiceContent, actualCefCommunicationServiceContent, "Content of CefCommunicationService.ts does not match.");

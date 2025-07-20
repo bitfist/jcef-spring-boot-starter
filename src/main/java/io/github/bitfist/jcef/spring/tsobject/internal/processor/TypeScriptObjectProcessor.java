@@ -27,26 +27,25 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
         "io.github.bitfist.jcef.spring.tsobject.TypeScriptConfiguration"
 })
 @SupportedOptions({
-        TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION, TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION,
-        TypeScriptObjectProcessor.WEB_BACKEND_HOST_OPTION, TypeScriptObjectProcessor.WEB_BACKEND_PORT_OPTION
+        TypeScriptObjectProcessor.JCEF_OUTPUT_PATH_OPTION,
+        TypeScriptObjectProcessor.JCEF_WEB_COMMUNICATION_ENABLED_OPTION,
+        TypeScriptObjectProcessor.JCEF_WEB_BACKEND_URI_OPTION
 })
 public class TypeScriptObjectProcessor extends AbstractProcessor {
 
     static final String JCEF_OUTPUT_PATH_OPTION = "jcef.output.path";
     static final String JCEF_WEB_COMMUNICATION_ENABLED_OPTION = "jcef.web.communication.enabled";
-    static final String WEB_BACKEND_HOST_OPTION = "jcef.web.backend.host";
-    static final String WEB_BACKEND_PORT_OPTION = "jcef.web.backend.port";
+    static final String JCEF_WEB_BACKEND_URI_OPTION = "jcef.web.backend.uri";
 
-    static final String DEFAULT_WEB_BACKEND_HOST = "http://localhost";
-    static final String DEFAULT_WEB_BACKEND_PORT = "8080";
+    static final String DEFAULT_WEB_BACKEND_URI = "http://localhost:8080";
+    static final String BACKEND_URI_PLACEHOLDER = "$backendUri";
 
     private Messager messager;
     private TypeScriptGenerator typeScriptGenerator;
     private boolean supportFilesCopied = false;
     private String outputPath;
     private boolean webCommunicationEnabled = false;
-    private String webBackendHost = DEFAULT_WEB_BACKEND_HOST;
-    private String webBackendPort = DEFAULT_WEB_BACKEND_PORT;
+    private String webBackendUri = DEFAULT_WEB_BACKEND_URI;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -61,15 +60,6 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         this.messager = processingEnv.getMessager();
         
         initializeOptions();
-        if (optionsAreInvalid()) {
-            return;
-        }
-
-        outputPath = processingEnv.getOptions().get(JCEF_OUTPUT_PATH_OPTION);
-        if (outputPath == null || outputPath.isBlank()) {
-            messager.printError("Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
-            return;
-        }
 
         this.typeScriptGenerator = new TypeScriptGenerator(outputPath, processingEnv.getElementUtils());
     }
@@ -77,8 +67,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
     private void initializeOptions() {
         outputPath = processingEnv.getOptions().get(JCEF_OUTPUT_PATH_OPTION);
         webCommunicationEnabled = Boolean.parseBoolean(processingEnv.getOptions().getOrDefault(JCEF_WEB_COMMUNICATION_ENABLED_OPTION, "false"));
-        webBackendHost = processingEnv.getOptions().getOrDefault(WEB_BACKEND_HOST_OPTION, DEFAULT_WEB_BACKEND_HOST);
-        webBackendPort = processingEnv.getOptions().getOrDefault(WEB_BACKEND_PORT_OPTION, DEFAULT_WEB_BACKEND_PORT);
+        webBackendUri = processingEnv.getOptions().getOrDefault(JCEF_WEB_BACKEND_URI_OPTION, DEFAULT_WEB_BACKEND_URI);
     }
     
     private boolean optionsAreInvalid() {
@@ -88,18 +77,17 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
             messager.printError("Required option " + JCEF_OUTPUT_PATH_OPTION + " is not set.");
             invalid = true;
         }
-        if (webCommunicationEnabled && (isBlank(webBackendHost) || isBlank(webBackendPort))) {
-            messager.printError("Required options " + WEB_BACKEND_HOST_OPTION + " and " + WEB_BACKEND_PORT_OPTION + " are not set.");
-            invalid = true;
-        }
-        
+
         return invalid;
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        var javascriptObjects = roundEnv.getElementsAnnotatedWith(TypeScriptObject.class);
+        if (optionsAreInvalid()) {
+            return false;
+        }
 
+        var javascriptObjects = roundEnv.getElementsAnnotatedWith(TypeScriptObject.class);
         if (javascriptObjects.isEmpty()) {
             messager.printMessage(Diagnostic.Kind.NOTE, "No @TypeScriptObject annotations found.");
             return false;
@@ -141,8 +129,7 @@ public class TypeScriptObjectProcessor extends AbstractProcessor {
         Path cefServiceDest = Path.of(this.outputPath, "jcef", TypeScriptGenerator.CEF_COMMUNICATION_SERVICE_NAME + ".ts");
         if (webCommunicationEnabled) {
             Function<String, String> processor = content -> {
-                content = content.replace("$host", processingEnv.getOptions().getOrDefault(WEB_BACKEND_HOST_OPTION, DEFAULT_WEB_BACKEND_HOST));
-                content = content.replace("$port", processingEnv.getOptions().getOrDefault(WEB_BACKEND_PORT_OPTION, DEFAULT_WEB_BACKEND_PORT));
+                content = content.replace(BACKEND_URI_PLACEHOLDER, webBackendUri);
                 return content;
             };
             copyFileFromClasspath("generator/templates/CefRestService.ts", cefServiceDest, processor);

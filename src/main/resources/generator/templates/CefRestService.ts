@@ -4,7 +4,7 @@ import {ResponseValueConverter} from "./ResponseValueConverter";
 
 export class CefCommunicationService {
     static request<T>(className: string, methodName: string, parameters: object, responseType: ResponseType): Promise<any> {
-        const targetUrl = '$host:$port/jcef';
+        const targetUrl = '$backendUri/jcef';
 
         const requestBody = {
             className,
