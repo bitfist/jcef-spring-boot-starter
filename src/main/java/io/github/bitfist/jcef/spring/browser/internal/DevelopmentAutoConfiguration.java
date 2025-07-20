@@ -7,9 +7,12 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -50,18 +53,24 @@ class DevelopmentAutoConfiguration {
         };
     }
 
-    @Bean
-    @ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
-    WebMvcConfigurer corsConfigurer(DevelopmentConfigurationProperties developmentProperties) {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(developmentProperties.getFrontendUri())
-                        .allowedMethods("POST")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
+    @Configuration
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnClass(WebMvcConfigurer.class)
+    static class CorsConfiguration {
+
+        @Bean
+        @ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
+        WebMvcConfigurer corsConfigurer(DevelopmentConfigurationProperties developmentProperties) {
+            return new WebMvcConfigurer() {
+                @Override
+                public void addCorsMappings(CorsRegistry registry) {
+                    registry.addMapping("/**")
+                            .allowedOrigins(developmentProperties.getFrontendUri())
+                            .allowedMethods("POST")
+                            .allowedHeaders("*")
+                            .allowCredentials(true);
+                }
+            };
+        }
     }
 }

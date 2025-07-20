@@ -17,15 +17,16 @@ repositories {
 
 dependencies {
     api(platform(libs.springBootBom))
-    api("jakarta.annotation:jakarta.annotation-api")
-    api("org.springframework.boot:spring-boot-autoconfigure")
+    api(platform(libs.springModulithBom))
+
     api("com.fasterxml.jackson.core:jackson-databind")
+    api("jakarta.annotation:jakarta.annotation-api")
     api("org.slf4j:slf4j-api")
+    api("org.springframework.boot:spring-boot-autoconfigure")
+    api("org.springframework.modulith:spring-modulith-api")
     api(libs.jcef)
     api(libs.jspecify)
 
-    implementation(platform(libs.springModulithBom))
-    implementation("org.springframework.modulith:spring-modulith-core")
 
     compileOnly("org.springframework:spring-webmvc")
 

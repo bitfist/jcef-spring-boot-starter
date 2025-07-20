@@ -56,7 +56,7 @@ class DevelopmentAutoConfigurationTest {
     @DisplayName("🐞 corsConfigurer throws no exception")
     void corsConfigurerDoesNotThrowException() {
         var developmentProperties = new DevelopmentConfigurationProperties(123, true, true, "http://invalid.host:80");
-        var corsConfigurer = new DevelopmentAutoConfiguration().corsConfigurer(developmentProperties);
+        var corsConfigurer = new DevelopmentAutoConfiguration.CorsConfiguration().corsConfigurer(developmentProperties);
         var corsRegistry = mock(CorsRegistry.class);
         var corsRegistration = mock(CorsRegistration.class);
 
