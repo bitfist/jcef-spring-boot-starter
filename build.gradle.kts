@@ -34,7 +34,7 @@ dependencies {
     testImplementation(platform(libs.springModulithBom))
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework:spring-webmvc")
+    testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation(libs.compileTesting)
     testImplementation(libs.googleTruth)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
