@@ -1,5 +1,5 @@
 [versions]
-springBoot     = "3.5.3"
+springBoot     = "3.5.4"
 
 [plugins]
 lombok               = { id = "io.freefair.lombok",              version = "8.14"   }
