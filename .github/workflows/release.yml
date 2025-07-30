@@ -1,10 +1,13 @@
 name: 'release'
+
 on:
-  push:
-    branches: [ "release" ]
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch: {}
 
 env:
   GPR_KEY: ${{ secrets.GPR_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   release:
@@ -19,38 +22,53 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_TOKEN }}
           fetch-depth: 0
+
+      - name: Determine if HEAD is SemVer‐tagged
+        id: check_tag
+        run: |
+          if git tag --points-at HEAD | grep -Eq '^?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "is_released=true" >> $GITHUB_ENV
+          else
+            echo "is_released=false" >> $GITHUB_ENV
+          fi
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
+        if: env.is_released == 'false'
         with:
           java-version: '21'
           distribution: 'liberica'
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        if: env.is_released == 'false'
         with:
           cache-read-only: false
+
       # Job
       - name: Run tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.is_released == 'false'
         run: ./gradlew test
+
       - name: Create release tag & changelog
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.is_released == 'false'
         run: |
           ./gradlew releaseVersion --no-commit
           git push origin --tags
           ./gradlew printChangeLog --file $(pwd)/changelog.md
           echo "RELEASE_VERSION=$(git tag --points-at HEAD)" >> $GITHUB_ENV
+
       - name: Build JAR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.is_released == 'false'
         run: ./gradlew build jar -x test
+
       - name: Publish Maven artifacts to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.is_released == 'false'
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
+
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
+        if: env.is_released == 'false'
         with:
           artifacts: "build/libs/*.jar"
           bodyFile: "changelog.md"
