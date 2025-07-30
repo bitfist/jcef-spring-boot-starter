@@ -3,6 +3,8 @@ package io.github.bitfist.jcef.spring.application;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 
 import java.nio.file.Path;
@@ -16,8 +18,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 @Getter
 @ConfigurationProperties(prefix = "jcef")
-public class JcefApplicationProperties {
+public class JcefApplicationProperties implements EnvironmentAware {
 
+    private String appDataPath;
     private final String applicationName;
     @Nullable
     private final String splashScreenClasspathResource;
@@ -35,10 +38,14 @@ public class JcefApplicationProperties {
             this.distributionClasspath = distributionClasspath;
         }
 
-        // ✅ Validate that index.html exists in the distributionClasspath on the classpath.
         if (!this.distributionClasspath.endsWith("/")) {
             this.distributionClasspath += "/";
         }
+        // ✅ Validate that index.html exists in the distributionClasspath on the classpath.
+        checkIndexHtmlExists();
+    }
+
+    private void checkIndexHtmlExists() {
         var path = this.distributionClasspath + "index.html";
         var indexHtml = new ClassPathResource(path);
         if (!indexHtml.exists()) {
@@ -46,38 +53,22 @@ public class JcefApplicationProperties {
         }
     }
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        appDataPath = environment.getProperty("os.app-data-path");
+        if (isBlank(appDataPath)) {
+            throw new IllegalArgumentException("os.app-data-path name must not be blank");
+        }
+    }
+
     // region Paths
 
-    private Path installationPath; // Base directory for app data
     private Path jcefInstallationPath; // Subdirectory for JCEF binaries
     private Path uiInstallationPath; // Subdirectory for UI files
     private Path jcefDataPath; // Subdirectory for JCEF data
 
-    /**
-     * 🗂 Determine the platform-specific installation path.
-     */
-    public Path getInstallationPath() {
-        if (installationPath == null) {
-            Path baseDir;
-            try {
-                if (OsIdentifier.getOsName().contains("win")) {
-                    baseDir = Path.of(System.getenv("APPDATA"));
-                } else if (OsIdentifier.getOsName().contains("mac")) {
-                    baseDir = Path.of(System.getProperty("user.home"), "Library", "Application Support");
-                } else {
-                    String xdg = System.getenv("XDG_DATA_HOME");
-                    if (xdg != null && !xdg.isBlank()) {
-                        baseDir = Path.of(xdg);
-                    } else {
-                        baseDir = Path.of(System.getProperty("user.home"), ".local", "share");
-                    }
-                }
-            } catch (NullPointerException e) {
-                baseDir = Path.of("~");
-            }
-            installationPath = baseDir.resolve(applicationName);
-        }
-        return installationPath;
+    public Path getApplicationInstallationPath() {
+        return Path.of(appDataPath, applicationName);
     }
 
     /**
@@ -85,7 +76,7 @@ public class JcefApplicationProperties {
      */
     public Path getJcefInstallationPath() {
         if (jcefInstallationPath == null) {
-            jcefInstallationPath = getInstallationPath().resolve("bundle");
+            jcefInstallationPath = getApplicationInstallationPath().resolve("bundle");
         }
         return jcefInstallationPath;
     }
@@ -95,7 +86,7 @@ public class JcefApplicationProperties {
      */
     public Path getJcefDataPath() {
         if (jcefDataPath == null) {
-            jcefDataPath = getInstallationPath().resolve("cef_data");
+            jcefDataPath = getApplicationInstallationPath().resolve("cef_data");
         }
         return jcefDataPath;
     }
@@ -105,16 +96,10 @@ public class JcefApplicationProperties {
      */
     public Path getUiInstallationPath() {
         if (uiInstallationPath == null) {
-            uiInstallationPath = getInstallationPath().resolve("ui");
+            uiInstallationPath = getApplicationInstallationPath().resolve("ui");
         }
         return uiInstallationPath;
     }
 
     // endregion
-
-    static class OsIdentifier {
-        static String getOsName() {
-            return System.getProperty("os.name").toLowerCase();
-        }
-    }
 }
