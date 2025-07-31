@@ -97,7 +97,7 @@ class JcefApplicationPropertiesTest {
 	void getJcefDataPath_returnsCorrectPath() {
 		var environment = mock(Environment.class);
 		when(environment.getProperty("jcef.application-name")).thenReturn(TEST_APP_NAME);
-		when(environment.getProperty("jcef.installation-path")).thenReturn("win\\" + TEST_APP_NAME);
+		when(environment.getProperty("jcef.installation-path")).thenReturn(Path.of("win", TEST_APP_NAME).toString());
 		try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
 			var properties = new JcefApplicationProperties(null, "ui");
 			properties.setEnvironment(environment);
@@ -116,7 +116,7 @@ class JcefApplicationPropertiesTest {
 	void getUiInstallationPath_returnsCorrectPath() {
 		var environment = mock(Environment.class);
 		when(environment.getProperty("jcef.application-name")).thenReturn(TEST_APP_NAME);
-		when(environment.getProperty("jcef.installation-path")).thenReturn("win\\" + TEST_APP_NAME);
+		when(environment.getProperty("jcef.installation-path")).thenReturn(Path.of("win", TEST_APP_NAME).toString());
 		try (var ignored = mockConstruction(ClassPathResource.class, (mock, context) -> when(mock.exists()).thenReturn(true))) {
 			var properties = new JcefApplicationProperties(null, "ui");
 			properties.setEnvironment(environment);
