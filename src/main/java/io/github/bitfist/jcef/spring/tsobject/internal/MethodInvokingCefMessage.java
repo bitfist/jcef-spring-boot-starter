@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 public class MethodInvokingCefMessage {
 
-    private String className;
-    private String methodName;
-    private @Nullable Map<String, Object> parameters;
+	private String className;
+	private String methodName;
+	private @Nullable Map<String, Object> parameters;
 }

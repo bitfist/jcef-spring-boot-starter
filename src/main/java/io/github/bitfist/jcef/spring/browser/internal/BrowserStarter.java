@@ -23,33 +23,33 @@ import java.util.List;
 @RequiredArgsConstructor
 class BrowserStarter {
 
-    private final CefApp cefApp;
-    private final CefBrowser cefBrowser;
-    private final List<CefBrowserFrameCustomizer> cefBrowserFrameCustomizers;
+	private final CefApp cefApp;
+	private final CefBrowser cefBrowser;
+	private final List<CefBrowserFrameCustomizer> cefBrowserFrameCustomizers;
 
-    @EventListener(ApplicationReadyEvent.class)
-    void onReady() {
-        SwingUtilities.invokeLater(() -> {
-            var frame = createFrame(cefBrowser, cefApp);
-            frame.setVisible(true);
-        });
-    }
+	@EventListener(ApplicationReadyEvent.class)
+	void onReady() {
+		SwingUtilities.invokeLater(() -> {
+			var frame = createFrame(cefBrowser, cefApp);
+			frame.setVisible(true);
+		});
+	}
 
-    private JFrame createFrame(CefBrowser browser, CefApp cefApp) {
-        var frame = new JFrame();
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add(browser.getUIComponent(), BorderLayout.CENTER);
-        frame.setSize(1280, 800);
-        frame.setLocationRelativeTo(null);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                cefApp.dispose();
-                frame.dispose();
-                System.exit(0);
-            }
-        });
-        cefBrowserFrameCustomizers.forEach(consumer -> consumer.accept(frame));
-        return frame;
-    }
+	private JFrame createFrame(CefBrowser browser, CefApp cefApp) {
+		var frame = new JFrame();
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.getContentPane().add(browser.getUIComponent(), BorderLayout.CENTER);
+		frame.setSize(1280, 800);
+		frame.setLocationRelativeTo(null);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				cefApp.dispose();
+				frame.dispose();
+				System.exit(0);
+			}
+		});
+		cefBrowserFrameCustomizers.forEach(consumer -> consumer.accept(frame));
+		return frame;
+	}
 }

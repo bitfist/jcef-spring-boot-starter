@@ -34,94 +34,94 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class DefaultInstallerSplashScreenTest {
 
-    @Mock
-    private SwingComponentFactory swingComponentFactory;
+	@Mock
+	private SwingComponentFactory swingComponentFactory;
 
-    @Mock
-    private SwingExecutor swingExecutor;
+	@Mock
+	private SwingExecutor swingExecutor;
 
-    @Mock
-    private JcefApplicationProperties applicationProperties;
+	@Mock
+	private JcefApplicationProperties applicationProperties;
 
-    @Mock
-    private BuildProperties buildProperties;
+	@Mock
+	private BuildProperties buildProperties;
 
-    @Mock
-    private Container contentPane;
+	@Mock
+	private Container contentPane;
 
-    @Mock
-    private JFrame frame;
+	@Mock
+	private JFrame frame;
 
-    @Mock
-    private JLabel stateLabel;
+	@Mock
+	private JLabel stateLabel;
 
-    @Mock
-    private JProgressBar progressBar;
+	@Mock
+	private JProgressBar progressBar;
 
-    @Mock
-    private JPanel panel;
+	@Mock
+	private JPanel panel;
 
-    private DefaultInstallerSplashScreen splashScreen;
+	private DefaultInstallerSplashScreen splashScreen;
 
-    @BeforeEach
-    @SuppressWarnings("unchecked")
-    void setUp() throws Exception {
-        // Stub factory methods
-        when(swingComponentFactory.createJFrame()).thenReturn(frame);
-        when(swingComponentFactory.createJLabel(anyString())).thenReturn(stateLabel);
-        when(swingComponentFactory.createJProgressBar(0, 100)).thenReturn(progressBar);
-        when(swingComponentFactory.createJPanel((LayoutManager) any())).thenReturn(panel);
-        when(swingComponentFactory.createJPanel((BiConsumer<JPanel, Graphics>) any())).thenReturn(panel);
-        when(applicationProperties.getSplashScreenClasspathResource()).thenReturn("empty.png");
+	@BeforeEach
+	@SuppressWarnings("unchecked")
+	void setUp() throws Exception {
+		// Stub factory methods
+		when(swingComponentFactory.createJFrame()).thenReturn(frame);
+		when(swingComponentFactory.createJLabel(anyString())).thenReturn(stateLabel);
+		when(swingComponentFactory.createJProgressBar(0, 100)).thenReturn(progressBar);
+		when(swingComponentFactory.createJPanel((LayoutManager) any())).thenReturn(panel);
+		when(swingComponentFactory.createJPanel((BiConsumer<JPanel, Graphics>) any())).thenReturn(panel);
+		when(applicationProperties.getSplashScreenClasspathResource()).thenReturn("empty.png");
 
-        when(buildProperties.getVersion()).thenReturn("1.0.0");
-        when(buildProperties.getTime()).thenReturn(Instant.now());
+		when(buildProperties.getVersion()).thenReturn("1.0.0");
+		when(buildProperties.getTime()).thenReturn(Instant.now());
 
-        when(frame.getContentPane()).thenReturn(contentPane);
+		when(frame.getContentPane()).thenReturn(contentPane);
 
-        splashScreen = new DefaultInstallerSplashScreen(swingComponentFactory, swingExecutor, applicationProperties, buildProperties);
-    }
+		splashScreen = new DefaultInstallerSplashScreen(swingComponentFactory, swingExecutor, applicationProperties, buildProperties);
+	}
 
-    @Test
-    @DisplayName("🔄 DOWNLOADING with percent>=0 shows progress")
-    void testHandleProgressDownloadingWithPercent() {
-        splashScreen.handleProgress(EnumProgress.DOWNLOADING, 50f);
+	@Test
+	@DisplayName("🔄 DOWNLOADING with percent>=0 shows progress")
+	void testHandleProgressDownloadingWithPercent() {
+		splashScreen.handleProgress(EnumProgress.DOWNLOADING, 50f);
 
-        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-        verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
-        runnableArgumentCaptor.getValue().run();
+		var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+		verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
+		runnableArgumentCaptor.getValue().run();
 
-        verify(stateLabel).setText("Downloading...");
-        verify(progressBar).setIndeterminate(false);
-        verify(progressBar).setValue(50);
-        verify(frame).setVisible(true);
-    }
+		verify(stateLabel).setText("Downloading...");
+		verify(progressBar).setIndeterminate(false);
+		verify(progressBar).setValue(50);
+		verify(frame).setVisible(true);
+	}
 
-    @Test
-    @DisplayName("🔄 DOWNLOADING with percent<0 shows indeterminate progress")
-    void testHandleProgressDownloadingIndeterminate() {
-        splashScreen.handleProgress(EnumProgress.DOWNLOADING, -1f);
+	@Test
+	@DisplayName("🔄 DOWNLOADING with percent<0 shows indeterminate progress")
+	void testHandleProgressDownloadingIndeterminate() {
+		splashScreen.handleProgress(EnumProgress.DOWNLOADING, -1f);
 
-        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-        verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
-        runnableArgumentCaptor.getValue().run();
+		var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+		verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
+		runnableArgumentCaptor.getValue().run();
 
-        verify(stateLabel).setText("Downloading...");
-        verify(progressBar).setIndeterminate(true);
-        verify(frame).setVisible(true);
-    }
+		verify(stateLabel).setText("Downloading...");
+		verify(progressBar).setIndeterminate(true);
+		verify(frame).setVisible(true);
+	}
 
-    @Test
-    @DisplayName("🔄 EXTRACTING sets indeterminate and shows progress")
-    void testHandleProgressExtracting() {
-        splashScreen.handleProgress(EnumProgress.EXTRACTING, 0f);
+	@Test
+	@DisplayName("🔄 EXTRACTING sets indeterminate and shows progress")
+	void testHandleProgressExtracting() {
+		splashScreen.handleProgress(EnumProgress.EXTRACTING, 0f);
 
-        var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-        verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
-        runnableArgumentCaptor.getValue().run();
+		var runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+		verify(swingExecutor).invokeLater(runnableArgumentCaptor.capture());
+		runnableArgumentCaptor.getValue().run();
 
-        verify(stateLabel).setText("Extracting...");
-        verify(progressBar).setIndeterminate(true);
-        verify(frame).setVisible(true);
-    }
+		verify(stateLabel).setText("Extracting...");
+		verify(progressBar).setIndeterminate(true);
+		verify(frame).setVisible(true);
+	}
 }

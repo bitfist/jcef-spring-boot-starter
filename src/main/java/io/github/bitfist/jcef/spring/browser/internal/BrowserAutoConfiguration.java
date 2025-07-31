@@ -41,95 +41,95 @@ import java.util.Optional;
 @Import(SwingComponentFactory.class)
 class BrowserAutoConfiguration {
 
-    private final JcefApplicationProperties applicationProperties;
-    private final DevelopmentConfigurationProperties developmentProperties;
+	private final JcefApplicationProperties applicationProperties;
+	private final DevelopmentConfigurationProperties developmentProperties;
 
-    @Bean
-    @ConditionalOnMissingBean
-    IProgressHandler progressFrameProvider(
-            SwingComponentFactory swingComponentFactory,
-            SwingExecutor swingExecutor,
-            JcefApplicationProperties applicationProperties,
-            Optional<BuildProperties> buildProperties
-    ) {
-        return new DefaultInstallerSplashScreen(swingComponentFactory, swingExecutor, applicationProperties, buildProperties.orElse(null));
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	IProgressHandler progressFrameProvider(
+			SwingComponentFactory swingComponentFactory,
+			SwingExecutor swingExecutor,
+			JcefApplicationProperties applicationProperties,
+			Optional<BuildProperties> buildProperties
+	) {
+		return new DefaultInstallerSplashScreen(swingComponentFactory, swingExecutor, applicationProperties, buildProperties.orElse(null));
+	}
 
-    @Bean
-    UIInstaller uiInstaller(JcefApplicationProperties applicationProperties) {
-        return new UIInstaller(applicationProperties);
-    }
+	@Bean
+	UIInstaller uiInstaller(JcefApplicationProperties applicationProperties) {
+		return new UIInstaller(applicationProperties);
+	}
 
-    @Bean
-    BrowserStarter browserStarter(CefApp cefApp, CefBrowser cefBrowser, List<CefBrowserFrameCustomizer> cefBrowserFrameCustomizers) {
-        return new BrowserStarter(cefApp, cefBrowser, cefBrowserFrameCustomizers);
-    }
+	@Bean
+	BrowserStarter browserStarter(CefApp cefApp, CefBrowser cefBrowser, List<CefBrowserFrameCustomizer> cefBrowserFrameCustomizers) {
+		return new BrowserStarter(cefApp, cefBrowser, cefBrowserFrameCustomizers);
+	}
 
-    @Bean
-    Browser browser(CefBrowser cefBrowser) {
-        return new DefaultBrowser(cefBrowser);
-    }
+	@Bean
+	Browser browser(CefBrowser cefBrowser) {
+		return new DefaultBrowser(cefBrowser);
+	}
 
-    // region CEF
+	// region CEF
 
-    @Bean
-    ObjectMapper cefBrowserObjectMapper() {
-        return new ObjectMapper();
-    }
+	@Bean
+	ObjectMapper cefBrowserObjectMapper() {
+		return new ObjectMapper();
+	}
 
-    @Bean
-    CefApp cefApp(ConfigurableApplicationContext applicationContext, IProgressHandler progressHandler, List<CefApplicationCustomizer> cefApplicationCustomizers) {
-        var builder = new CefAppBuilder();
-        builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
-        builder.getCefSettings().windowless_rendering_enabled = false;
-        builder.getCefSettings().root_cache_path = applicationProperties.getJcefDataPath().toFile().getAbsolutePath();
-        builder.setProgressHandler(progressHandler);
-        builder.setAppHandler(new MavenCefAppHandlerAdapter() {
-            @Override
-            public void stateHasChanged(CefApp.CefAppState state) {
-                if (state == CefApp.CefAppState.TERMINATED) {
-                    applicationContext.close();
-                }
-            }
-        });
-        cefApplicationCustomizers.forEach(consumer -> consumer.accept(builder));
+	@Bean
+	CefApp cefApp(ConfigurableApplicationContext applicationContext, IProgressHandler progressHandler, List<CefApplicationCustomizer> cefApplicationCustomizers) {
+		var builder = new CefAppBuilder();
+		builder.setInstallDir(applicationProperties.getJcefInstallationPath().toFile());
+		builder.getCefSettings().windowless_rendering_enabled = false;
+		builder.getCefSettings().root_cache_path = applicationProperties.getJcefDataPath().toFile().getAbsolutePath();
+		builder.setProgressHandler(progressHandler);
+		builder.setAppHandler(new MavenCefAppHandlerAdapter() {
+			@Override
+			public void stateHasChanged(CefApp.CefAppState state) {
+				if (state == CefApp.CefAppState.TERMINATED) {
+					applicationContext.close();
+				}
+			}
+		});
+		cefApplicationCustomizers.forEach(consumer -> consumer.accept(builder));
 
-        try {
-            return builder.build();
-        } catch (Exception e) {
-            log.error("Failed to create CefApp", e);
-            throw new RuntimeException(e);
-        }
-    }
+		try {
+			return builder.build();
+		} catch (Exception e) {
+			log.error("Failed to create CefApp", e);
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Bean
-    CefClient cefClient(CefApp cefApp, CefQueryHandler messageHandler, List<CefClientCustomizer> cefClientCustomizers) {
-        var client = cefApp.createClient();
+	@Bean
+	CefClient cefClient(CefApp cefApp, CefQueryHandler messageHandler, List<CefClientCustomizer> cefClientCustomizers) {
+		var client = cefApp.createClient();
 
-        // IMPORTANT: the message router must be created AFTER the client, otherwise this call causes a JVM crash
-        var messageRouter = CefMessageRouter.create();
-        messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
+		// IMPORTANT: the message router must be created AFTER the client, otherwise this call causes a JVM crash
+		var messageRouter = CefMessageRouter.create();
+		messageRouter.addHandler(new DefaultCefMessageRouter(messageHandler), true);
 
-        client.addMessageRouter(messageRouter);
-        cefClientCustomizers.forEach(consumer -> consumer.accept(client));
+		client.addMessageRouter(messageRouter);
+		cefClientCustomizers.forEach(consumer -> consumer.accept(client));
 
-        return client;
-    }
+		return client;
+	}
 
-    @Bean
-    CefBrowser cefBrowser(CefClient client, List<CefBrowserCustomizer> cefBrowserCustomizers) {
-        var browser = client.createBrowser(determineUiUri().toString(), false, false);
-        cefBrowserCustomizers.forEach(consumer -> consumer.accept(browser));
-        return browser;
-    }
+	@Bean
+	CefBrowser cefBrowser(CefClient client, List<CefBrowserCustomizer> cefBrowserCustomizers) {
+		var browser = client.createBrowser(determineUiUri().toString(), false, false);
+		cefBrowserCustomizers.forEach(consumer -> consumer.accept(browser));
+		return browser;
+	}
 
-    private URI determineUiUri() {
-        if (developmentProperties.isEnableWebCommunication()) {
-            return URI.create(developmentProperties.getFrontendUri());
-        } else {
-            return applicationProperties.getUiInstallationPath().resolve("index.html").toUri();
-        }
-    }
+	private URI determineUiUri() {
+		if (developmentProperties.isEnableWebCommunication()) {
+			return URI.create(developmentProperties.getFrontendUri());
+		} else {
+			return applicationProperties.getUiInstallationPath().resolve("index.html").toUri();
+		}
+	}
 
-    // endregion
+	// endregion
 }

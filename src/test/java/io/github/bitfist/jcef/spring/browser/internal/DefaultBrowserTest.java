@@ -8,14 +8,14 @@ import static org.mockito.Mockito.verify;
 
 class DefaultBrowserTest {
 
-    @Test
-    void executeJavaScript() {
-        CefBrowser cefBrowser = mock(CefBrowser.class);
-        var code = "console.log('Hello World!');";
+	@Test
+	void executeJavaScript() {
+		CefBrowser cefBrowser = mock(CefBrowser.class);
+		var code = "console.log('Hello World!');";
 
-        new DefaultBrowser(cefBrowser).executeJavaScript(code);
+		new DefaultBrowser(cefBrowser).executeJavaScript(code);
 
-        verify(cefBrowser).executeJavaScript(code, null, 0);
-    }
+		verify(cefBrowser).executeJavaScript(code, null, 0);
+	}
 
 }

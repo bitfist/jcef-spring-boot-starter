@@ -8,19 +8,19 @@ import static org.mockito.Mockito.verify;
 
 class CefQueryRestEndpointTest {
 
-    private final CefQueryHandler queryHandler = mock(CefQueryHandler.class);
+	private final CefQueryHandler queryHandler = mock(CefQueryHandler.class);
 
-    private final CefQueryRestEndpoint endpoint = new CefQueryRestEndpoint(queryHandler);
+	private final CefQueryRestEndpoint endpoint = new CefQueryRestEndpoint(queryHandler);
 
-    @Test
-    void shouldInvokeQueryHandler() {
-        var payload = "<payload>";
+	@Test
+	void shouldInvokeQueryHandler() {
+		var payload = "<payload>";
 
-        // when
-        endpoint.invokeMethod(payload);
+		// when
+		endpoint.invokeMethod(payload);
 
-        // then
-        verify(queryHandler).handleQuery(payload);
-    }
+		// then
+		verify(queryHandler).handleQuery(payload);
+	}
 
 }

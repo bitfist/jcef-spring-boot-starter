@@ -8,8 +8,8 @@ openRewrite          = { id = "org.openrewrite.rewrite",         version = "7.12
 
 [libraries]
 # region BOMs
-springBootBom     = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot"     }
-springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version     = "1.4.2"          }
+springBootBom     = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version     = "1.4.2"      }
 # endregion
 
 jcef     = { module = "me.friwi:jcefmaven",    version = "135.0.20" }

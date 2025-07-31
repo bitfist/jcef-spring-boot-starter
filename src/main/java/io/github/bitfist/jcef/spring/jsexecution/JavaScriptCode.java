@@ -20,10 +20,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JavaScriptCode {
 
-    /**
-     * Specifies the JavaScript code to be deployed to the browser.
-     *
-     * @return the JavaScript code as a string
-     */
-    String value();
+	/**
+	 * Specifies the JavaScript code to be deployed to the browser.
+	 *
+	 * @return the JavaScript code as a string
+	 */
+	String value();
 }

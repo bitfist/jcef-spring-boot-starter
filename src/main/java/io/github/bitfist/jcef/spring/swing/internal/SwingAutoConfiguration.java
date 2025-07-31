@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 class SwingAutoConfiguration {
 
-    @Bean
-    SwingComponentFactory swingComponentFactory() {
-        return new SwingComponentFactory();
-    }
+	@Bean
+	SwingComponentFactory swingComponentFactory() {
+		return new SwingComponentFactory();
+	}
 
-    @Bean
-    SwingExecutor swingExecutor() {
-        return new SwingExecutor();
-    }
+	@Bean
+	SwingExecutor swingExecutor() {
+		return new SwingExecutor();
+	}
 }

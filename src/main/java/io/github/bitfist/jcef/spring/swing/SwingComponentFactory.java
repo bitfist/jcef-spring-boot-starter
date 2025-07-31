@@ -10,30 +10,30 @@ import java.util.function.BiConsumer;
 
 public class SwingComponentFactory {
 
-    public JFrame createJFrame() {
-        return new JFrame();
-    }
+	public JFrame createJFrame() {
+		return new JFrame();
+	}
 
-    public JLabel createJLabel(String text) {
-        return new JLabel(text);
-    }
+	public JLabel createJLabel(String text) {
+		return new JLabel(text);
+	}
 
-    public JProgressBar createJProgressBar(int min, int max) {
-        return new JProgressBar(min, max);
-    }
+	public JProgressBar createJProgressBar(int min, int max) {
+		return new JProgressBar(min, max);
+	}
 
-    public JPanel createJPanel(LayoutManager layout) {
-        return new JPanel(layout);
-    }
+	public JPanel createJPanel(LayoutManager layout) {
+		return new JPanel(layout);
+	}
 
-    public JPanel createJPanel(BiConsumer<JPanel, Graphics> renderer) {
-        return new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                renderer.accept(this, g);
-            }
-        };
-    }
+	public JPanel createJPanel(BiConsumer<JPanel, Graphics> renderer) {
+		return new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				renderer.accept(this, g);
+			}
+		};
+	}
 
 }

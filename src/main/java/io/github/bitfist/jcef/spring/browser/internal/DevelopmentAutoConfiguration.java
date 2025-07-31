@@ -31,46 +31,46 @@ import javax.swing.SwingUtilities;
 @Import(CefQueryRestEndpoint.class)
 class DevelopmentAutoConfiguration {
 
-    @Bean
-    @ConditionalOnProperty(name = "jcef.development.show-developer-tools", havingValue = "true")
-    CefClientCustomizer developerToolsCustomizer() {
-        return cefClient -> {
-            cefClient.addLoadHandler(new CefLoadHandlerAdapter() {
-                @Override
-                public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatus) {
-                    SwingUtilities.invokeLater(browser::openDevTools);
-                }
-            });
-        };
-    }
+	@Bean
+	@ConditionalOnProperty(name = "jcef.development.show-developer-tools", havingValue = "true")
+	CefClientCustomizer developerToolsCustomizer() {
+		return cefClient -> {
+			cefClient.addLoadHandler(new CefLoadHandlerAdapter() {
+				@Override
+				public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatus) {
+					SwingUtilities.invokeLater(browser::openDevTools);
+				}
+			});
+		};
+	}
 
-    @Bean
-    @ConditionalOnProperty(name = "jcef.development.debug-port")
-    CefApplicationCustomizer debugPortCustomizer(DevelopmentConfigurationProperties applicationProperties) {
-        return builder -> {
-            builder.getCefSettings().remote_debugging_port = applicationProperties.getDebugPort();
-            builder.addJcefArgs("--remote-allow-origins=*");
-        };
-    }
+	@Bean
+	@ConditionalOnProperty(name = "jcef.development.debug-port")
+	CefApplicationCustomizer debugPortCustomizer(DevelopmentConfigurationProperties applicationProperties) {
+		return builder -> {
+			builder.getCefSettings().remote_debugging_port = applicationProperties.getDebugPort();
+			builder.addJcefArgs("--remote-allow-origins=*");
+		};
+	}
 
-    @Configuration
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-    @ConditionalOnClass(WebMvcConfigurer.class)
-    static class CorsConfiguration {
+	@Configuration
+	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+	@ConditionalOnClass(WebMvcConfigurer.class)
+	static class CorsConfiguration {
 
-        @Bean
-        @ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
-        WebMvcConfigurer corsConfigurer(DevelopmentConfigurationProperties developmentProperties) {
-            return new WebMvcConfigurer() {
-                @Override
-                public void addCorsMappings(CorsRegistry registry) {
-                    registry.addMapping("/**")
-                            .allowedOrigins(developmentProperties.getFrontendUri())
-                            .allowedMethods("POST")
-                            .allowedHeaders("*")
-                            .allowCredentials(true);
-                }
-            };
-        }
-    }
+		@Bean
+		@ConditionalOnProperty(name = "jcef.development.enable-web-communication", havingValue = "true")
+		WebMvcConfigurer corsConfigurer(DevelopmentConfigurationProperties developmentProperties) {
+			return new WebMvcConfigurer() {
+				@Override
+				public void addCorsMappings(CorsRegistry registry) {
+					registry.addMapping("/**")
+							.allowedOrigins(developmentProperties.getFrontendUri())
+							.allowedMethods("POST")
+							.allowedHeaders("*")
+							.allowCredentials(true);
+				}
+			};
+		}
+	}
 }

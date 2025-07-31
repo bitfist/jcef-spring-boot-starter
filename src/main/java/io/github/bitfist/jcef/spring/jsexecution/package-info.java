@@ -1,5 +1,5 @@
 @ApplicationModule(
-        displayName = "JSExecution"
+		displayName = "JSExecution"
 )
 @NonNullApi
 package io.github.bitfist.jcef.spring.jsexecution;

@@ -10,22 +10,22 @@ import org.springframework.modulith.docs.Documenter;
 @Modulith
 public class Architecture {
 
-    private final ApplicationModules applicationModules = ApplicationModules.of(Architecture.class);
+	private final ApplicationModules applicationModules = ApplicationModules.of(Architecture.class);
 
-    @Test
-    @DisplayName("🔍 Verify module architecture")
-    void verifyArchitecture() {
-        applicationModules.verify();
-    }
+	@Test
+	@DisplayName("🔍 Verify module architecture")
+	void verifyArchitecture() {
+		applicationModules.verify();
+	}
 
-    @Test
-    @DisplayName("📝 Write documentation")
-    @DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Unnecessary in CI")
-    void writeDocumentation() {
-        new Documenter(applicationModules)
-                .writeModulesAsPlantUml()
-                .writeIndividualModulesAsPlantUml()
-                .writeDocumentation()
-                .writeAggregatingDocument();
-    }
+	@Test
+	@DisplayName("📝 Write documentation")
+	@DisabledIfEnvironmentVariable(named = "CI", matches = ".*", disabledReason = "Unnecessary in CI")
+	void writeDocumentation() {
+		new Documenter(applicationModules)
+				.writeModulesAsPlantUml()
+				.writeIndividualModulesAsPlantUml()
+				.writeDocumentation()
+				.writeAggregatingDocument();
+	}
 }

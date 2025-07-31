@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 public interface CefQueryHandler {
 
-    @Nullable String handleQuery(@Nullable String query);
+	@Nullable
+	String handleQuery(@Nullable String query);
 
 }

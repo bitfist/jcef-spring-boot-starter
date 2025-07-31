@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SwingAutoConfigurationTest {
 
-    @Test
-    void assertSwingComponentFactory() {
-        assertNotNull(new SwingAutoConfiguration().swingComponentFactory());
-    }
+	@Test
+	void assertSwingComponentFactory() {
+		assertNotNull(new SwingAutoConfiguration().swingComponentFactory());
+	}
 
-    @Test
-    void assertSwingExecutor() {
-        assertNotNull(new SwingAutoConfiguration().swingExecutor());
-    }
+	@Test
+	void assertSwingExecutor() {
+		assertNotNull(new SwingAutoConfiguration().swingExecutor());
+	}
 }

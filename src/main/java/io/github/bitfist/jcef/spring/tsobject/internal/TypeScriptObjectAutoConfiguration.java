@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 class TypeScriptObjectAutoConfiguration {
 
-    @Bean
-    MethodInvokingCefQueryHandler methodInvokingCefMessageHandler(ApplicationContext applicationContext) {
-        var messageHandler = new MethodInvokingCefMessageHandler(applicationContext);
-        return new MethodInvokingCefQueryHandler(messageHandler);
-    }
+	@Bean
+	MethodInvokingCefQueryHandler methodInvokingCefMessageHandler(ApplicationContext applicationContext) {
+		var messageHandler = new MethodInvokingCefMessageHandler(applicationContext);
+		return new MethodInvokingCefQueryHandler(messageHandler);
+	}
 }

@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 class DefaultJavaScriptExecutor implements JavaScriptExecutor {
 
-    private final Browser browser;
+	private final Browser browser;
 
-    @Override
-    public void execute(String code) {
-        browser.executeJavaScript(code);
-    }
+	@Override
+	public void execute(String code) {
+		browser.executeJavaScript(code);
+	}
 }

@@ -7,10 +7,10 @@ package io.github.bitfist.jcef.spring.jsexecution;
  */
 public interface JavaScriptExecutor {
 
-    /**
-     * Executes the provided JavaScript code within the browser.
-     *
-     * @param code the JavaScript code to be executed
-     */
-    void execute(String code);
+	/**
+	 * Executes the provided JavaScript code within the browser.
+	 *
+	 * @param code the JavaScript code to be executed
+	 */
+	void execute(String code);
 }

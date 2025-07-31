@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 
 public class SwingExecutor {
 
-    public void invokeLater(Runnable runnable) {
-        SwingUtilities.invokeLater(runnable);
-    }
+	public void invokeLater(Runnable runnable) {
+		SwingUtilities.invokeLater(runnable);
+	}
 }

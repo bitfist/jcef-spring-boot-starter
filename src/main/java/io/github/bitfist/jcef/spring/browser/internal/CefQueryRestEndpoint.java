@@ -32,11 +32,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 class CefQueryRestEndpoint {
 
-    private final CefQueryHandler queryHandler;
+	private final CefQueryHandler queryHandler;
 
-    @PostMapping
-    @Nullable
-    String invokeMethod(@RequestBody @Nullable String query) {
-        return queryHandler.handleQuery(query);
-    }
+	@PostMapping
+	@Nullable
+	String invokeMethod(@RequestBody @Nullable String query) {
+		return queryHandler.handleQuery(query);
+	}
 }

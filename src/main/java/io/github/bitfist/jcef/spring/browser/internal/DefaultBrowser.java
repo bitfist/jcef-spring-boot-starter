@@ -7,10 +7,10 @@ import org.cef.browser.CefBrowser;
 @RequiredArgsConstructor
 class DefaultBrowser implements Browser {
 
-    private final CefBrowser cefBrowser;
+	private final CefBrowser cefBrowser;
 
-    @Override
-    public void executeJavaScript(String code) {
-        cefBrowser.executeJavaScript(code, null, 0);
-    }
+	@Override
+	public void executeJavaScript(String code) {
+		cefBrowser.executeJavaScript(code, null, 0);
+	}
 }

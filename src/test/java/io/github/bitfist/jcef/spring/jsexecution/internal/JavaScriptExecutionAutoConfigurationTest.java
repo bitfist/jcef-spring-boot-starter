@@ -8,12 +8,12 @@ import static org.mockito.Mockito.mock;
 
 class JavaScriptExecutionAutoConfigurationTest {
 
-    @Test
-    void createsBean() {
-        Browser browser = mock(Browser.class);
-        var autoConfiguration = new JavaScriptExecutionAutoConfiguration();
+	@Test
+	void createsBean() {
+		Browser browser = mock(Browser.class);
+		var autoConfiguration = new JavaScriptExecutionAutoConfiguration();
 
-        assertNotNull(autoConfiguration.javaScriptExecutor(browser));
-    }
+		assertNotNull(autoConfiguration.javaScriptExecutor(browser));
+	}
 
 }

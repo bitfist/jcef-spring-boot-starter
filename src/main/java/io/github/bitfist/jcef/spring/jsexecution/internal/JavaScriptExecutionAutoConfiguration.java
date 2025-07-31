@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 class JavaScriptExecutionAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    JavaScriptExecutor javaScriptExecutor(Browser browser) {
-        return new DefaultJavaScriptExecutor(browser);
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	JavaScriptExecutor javaScriptExecutor(Browser browser) {
+		return new DefaultJavaScriptExecutor(browser);
+	}
 }

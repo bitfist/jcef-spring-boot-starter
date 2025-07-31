@@ -8,12 +8,12 @@ import static org.mockito.Mockito.mock;
 
 class TypeScriptObjectAutoConfigurationTest {
 
-    private final ApplicationContext applicationContext = mock(ApplicationContext.class);
+	private final ApplicationContext applicationContext = mock(ApplicationContext.class);
 
-    private final TypeScriptObjectAutoConfiguration autoConfiguration = new TypeScriptObjectAutoConfiguration();
+	private final TypeScriptObjectAutoConfiguration autoConfiguration = new TypeScriptObjectAutoConfiguration();
 
-    @Test
-    void shouldCreateCefMessageHandler() {
-        assertNotNull(autoConfiguration.methodInvokingCefMessageHandler(applicationContext));
-    }
+	@Test
+	void shouldCreateCefMessageHandler() {
+		assertNotNull(autoConfiguration.methodInvokingCefMessageHandler(applicationContext));
+	}
 }

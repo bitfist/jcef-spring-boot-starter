@@ -1,5 +1,5 @@
 @ApplicationModule(
-        displayName = "TSObject"
+		displayName = "TSObject"
 )
 @NonNullApi
 package io.github.bitfist.jcef.spring.tsobject;

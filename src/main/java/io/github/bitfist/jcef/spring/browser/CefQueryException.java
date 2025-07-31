@@ -8,15 +8,15 @@ import lombok.Getter;
 @Getter
 public class CefQueryException extends RuntimeException {
 
-    private final int errorCode;
+	private final int errorCode;
 
-    public CefQueryException(int errorCode, Exception cause) {
-        super(cause);
-        this.errorCode = errorCode;
-    }
+	public CefQueryException(int errorCode, Exception cause) {
+		super(cause);
+		this.errorCode = errorCode;
+	}
 
-    public CefQueryException(int errorCode, String message) {
-        super(message);
-        this.errorCode = errorCode;
-    }
+	public CefQueryException(int errorCode, String message) {
+		super(message);
+		this.errorCode = errorCode;
+	}
 }
