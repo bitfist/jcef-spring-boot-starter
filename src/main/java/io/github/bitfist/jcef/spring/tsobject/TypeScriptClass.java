@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface TypeScriptDto {
+public @interface TypeScriptClass {
 
 	String path() default "";
 }

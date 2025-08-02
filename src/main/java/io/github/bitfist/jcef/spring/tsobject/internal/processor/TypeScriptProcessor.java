@@ -1,6 +1,6 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
-import io.github.bitfist.jcef.spring.tsobject.TypeScriptDto;
+import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptService;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -19,13 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @SupportedAnnotationTypes({
-		"io.github.bitfist.jcef.spring.tsobject.TypeScriptDto",
+		"io.github.bitfist.jcef.spring.tsobject.TypeScriptClass",
 		"io.github.bitfist.jcef.spring.tsobject.TypeScriptService"
 })
 @SupportedOptions({
@@ -89,10 +88,12 @@ public class TypeScriptProcessor extends AbstractProcessor {
 			return true;
 		}
 
-		// Process @TypeScriptDto annotations
-		for (Element element : roundEnv.getElementsAnnotatedWith(TypeScriptDto.class)) {
+		// Process @TypeScriptClass annotations
+		for (Element element : roundEnv.getElementsAnnotatedWith(TypeScriptClass.class)) {
 			if (element.getKind() == ElementKind.CLASS) {
-				modelGenerator.processDto((TypeElement) element);
+				modelGenerator.processClass((TypeElement) element);
+			} else if (element.getKind() == ElementKind.ENUM) {
+				modelGenerator.processEnum((TypeElement) element);
 			}
 		}
 
@@ -128,27 +129,27 @@ public class TypeScriptProcessor extends AbstractProcessor {
 	}
 
 	private void generateTypeScriptFiles() {
-		var dtoGenerator = new TypeScriptDtoGenerator();
+		var classModel = modelGenerator.getClassModel();
+		var classGenerator = new TypeScriptClassGenerator();
+		var enumGenerator = new TypeScriptEnumGenerator();
 		var serviceGenerator = new TypeScriptServiceGenerator();
 
-		Map<String, TypeScriptClass> classModel = modelGenerator.getClassModel();
-		for (TypeScriptClass tsClass : classModel.values()) {
+		for (TSClass tsClass : classModel.values()) {
 			try {
-				if (tsClass.getType() == TypeScriptClass.Type.DTO) {
-					var content = dtoGenerator.generate(tsClass, classModel);
-					writeFile(tsClass, content);
-				}
-				if (tsClass.getType() == TypeScriptClass.Type.SERVICE) {
-					var content = serviceGenerator.generate(tsClass, classModel);
-					writeFile(tsClass, content);
-				}
+				var content = switch (tsClass.getType()) {
+					case CLASS -> classGenerator.generate(tsClass, classModel);
+					case ENUM -> enumGenerator.generate(tsClass);
+					case SERVICE -> serviceGenerator.generate(tsClass, classModel);
+				};
+
+				writeFile(tsClass, content);
 			} catch (IOException e) {
 				messager.printMessage(Diagnostic.Kind.ERROR, "Failed to generate TypeScript for " + tsClass.getJavaClassName() + ": " + e.getMessage());
 			}
 		}
 	}
 
-	private void writeFile(TypeScriptClass tsClass, String content) throws IOException {
+	private void writeFile(TSClass tsClass, String content) throws IOException {
 		var filePath = Paths.get(outputPath, tsClass.getOutputPath(), tsClass.getTsClassName() + ".ts");
 		filePath.getParent().toFile().mkdirs();
 		Files.writeString(

@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 class TypeScriptServiceGenerator {
 
-	public String generate(TypeScriptClass tsClass, Map<String, TypeScriptClass> classModel) {
+	public String generate(TSClass tsClass, Map<String, TSClass> classModel) {
 		var buffer = new StringBuilder();
 
 		// Header comment
@@ -28,8 +28,7 @@ class TypeScriptServiceGenerator {
 				var importedClass = findClassBySimpleName(importClass, classModel);
 				if (importedClass != null) {
 					var importPath = PathUtils.calculateRelativePath(tsClass.getOutputPath(), importedClass.getOutputPath(), importedClass.getTsClassName());
-					buffer.append("import type { ").append(importedClass.getTsClassName()).append(" } from '")
-							.append(importPath).append("';\n");
+					buffer.append("import type { ").append(importedClass.getTsClassName()).append(" } from '").append(importPath).append("';\n");
 				}
 			}
 		}
@@ -107,7 +106,7 @@ class TypeScriptServiceGenerator {
 		};
 	}
 
-	private Set<String> collectImports(TypeScriptClass tsClass, Map<String, TypeScriptClass> classModel) {
+	private Set<String> collectImports(TSClass tsClass, Map<String, TSClass> classModel) {
 		var imports = new TreeSet<String>();
 
 		for (Method method : tsClass.getMethods()) {
@@ -123,7 +122,7 @@ class TypeScriptServiceGenerator {
 		return imports;
 	}
 
-	private void addTypeToImports(String type, Set<String> imports, Map<String, TypeScriptClass> classModel) {
+	private void addTypeToImports(String type, Set<String> imports, Map<String, TSClass> classModel) {
 		// Extract base type from arrays and generic types
 		var baseType = type.replaceAll("\\[\\]$", "");
 		baseType = baseType.replaceAll("\\{.*\\}", "");
@@ -139,8 +138,8 @@ class TypeScriptServiceGenerator {
 				type.equals("any") || type.equals("void") || type.contains("[") || type.contains("{");
 	}
 
-	private @Nullable TypeScriptClass findClassBySimpleName(String simpleName, Map<String, TypeScriptClass> classModel) {
-		for (TypeScriptClass tsClass : classModel.values()) {
+	private @Nullable TSClass findClassBySimpleName(String simpleName, Map<String, TSClass> classModel) {
+		for (TSClass tsClass : classModel.values()) {
 			if (tsClass.getTsClassName().equals(simpleName)) {
 				return tsClass;
 			}

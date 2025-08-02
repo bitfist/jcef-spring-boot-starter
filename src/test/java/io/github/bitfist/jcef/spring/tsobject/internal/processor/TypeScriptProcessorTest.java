@@ -27,9 +27,9 @@ class TypeScriptProcessorTest {
 			"""
 			package test;
 
-			import io.github.bitfist.jcef.spring.tsobject.TypeScriptDto;
+			import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 
-			@TypeScriptDto(path = "custom/path")
+			@TypeScriptClass(path = "custom/path")
 			class ExampleDto {
 				public String name;
 				public int count;
@@ -42,14 +42,24 @@ class TypeScriptProcessorTest {
 			"""
 			package test;
 			
-			import io.github.bitfist.jcef.spring.tsobject.TypeScriptDto;
-			
 			class ExampleDto2 {
 				public String name;
+				public TestEnum testEnum;
 			
-				public ExampleDto2(String name){
+				public ExampleDto2(String name, TestEnum testEnum){
 					this.name = name;
+					this.testEnum = testEnum;
 				}
+			}
+			""");
+
+	private static final JavaFileObject SIMPLE_ENUM = JavaFileObjects.forSourceString("test.TestEnum",
+			// language=java
+			"""
+			package test;
+			
+			enum TestEnum {
+				Linz, Wels, Steyr
 			}
 			""");
 
@@ -65,8 +75,8 @@ class TypeScriptProcessorTest {
 
             @TypeScriptService
             class ExampleService {
-                ExampleDto2 greet(String who, int age, boolean uber, List<String> parents, Map<String, Integer> aMap) {
-                    return new ExampleDto2("Hello " + who);
+                ExampleDto2 greet(String who, int age, boolean uber, List<String> parents, Map<String, Integer> aMap, TestEnum testEnum) {
+                    return new ExampleDto2("Hello " + who, testEnum);
                 }
             }
             """);
@@ -86,7 +96,7 @@ class TypeScriptProcessorTest {
 							"jcef.output.path", outputPath,
 							"jcef.web.communication.enabled", "false"
 					).entrySet().stream().map(e -> "-A" + e.getKey() + "=" + e.getValue()).toList())
-					.compile(SIMPLE_DTO, SIMPLE_DTO2, SIMPLE_SERVICE);
+					.compile(SIMPLE_DTO, SIMPLE_DTO2, SIMPLE_ENUM, SIMPLE_SERVICE);
 
 			// Processor should succeed
 			assertEquals(SUCCESS, compilation.status(), "Compilation should succeed with valid options");
@@ -94,14 +104,17 @@ class TypeScriptProcessorTest {
 			// Check that expected TypeScript files exist on disk
 			var dtoTs = tmpDir.resolve("custom").resolve("path").resolve("ExampleDto.ts");
 			var dto2Ts = tmpDir.resolve("test").resolve("ExampleDto2.ts");
+			var enumTs = tmpDir.resolve("test").resolve("TestEnum.ts");
 			var serviceTs = tmpDir.resolve("test").resolve("ExampleService.ts");
 
 			assertTrue(Files.exists(dtoTs), "DTO TypeScript file should be generated: " + dtoTs);
 			assertTrue(Files.exists(dto2Ts), "DTO TypeScript file should be generated: " + dto2Ts);
+			assertTrue(Files.exists(enumTs), "Enum TypeScript file should be generated: " + enumTs);
 			assertTrue(Files.exists(serviceTs), "Service TypeScript file should be generated: " + serviceTs);
 
 			var dtoContent = Files.readString(dtoTs);
 			var dto2Content = Files.readString(dto2Ts);
+			var enumContent = Files.readString(enumTs);
 			var serviceContent = Files.readString(serviceTs);
 
 			// Basic content assertions
@@ -112,8 +125,13 @@ class TypeScriptProcessorTest {
 			assertTrue(dto2Content.contains("export interface ExampleDto2"), "DTO .ts should declare interface");
 			assertTrue(dto2Content.contains("name:"), "DTO should include 'name' field");
 
+			assertTrue(enumContent.contains("export enum TestEnum"), "Enum .ts should declare enum");
+			assertTrue(enumContent.contains("Linz = 'Linz'"), "Enum should include 'Linz' value");
+			assertTrue(enumContent.contains("Wels = 'Wels'"), "Enum should include 'Wels' value");
+			assertTrue(enumContent.contains("Steyr = 'Steyr'"), "Enum should include 'Steyr' value");
+
 			assertTrue(serviceContent.contains("export class ExampleService"), "Service .ts should declare class");
-			assertTrue(serviceContent.contains("static async greet(who: string, age: number, uber: boolean, parents: string[], aMap: { [key: string]: number }): Promise<ExampleDto2>"), "Service method signature should appear");
+			assertTrue(serviceContent.contains("static async greet(who: string, age: number, uber: boolean, parents: string[], aMap: { [key: string]: number }, testEnum: TestEnum): Promise<ExampleDto2>"), "Service method signature should appear");
 			assertTrue(serviceContent.contains("CefCommunicationService.request"), "Service should use CefCommunicationService");
 
 			// Optionally, if support files are expected to be copied, verify one exists
@@ -146,9 +164,9 @@ class TypeScriptProcessorTest {
                     """
                     package test;
 
-                    import io.github.bitfist.jcef.spring.tsobject.TypeScriptDto;
+                    import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 
-                    @TypeScriptDto
+                    @TypeScriptClass
                     class EmptyDto {
                     }
                     """);

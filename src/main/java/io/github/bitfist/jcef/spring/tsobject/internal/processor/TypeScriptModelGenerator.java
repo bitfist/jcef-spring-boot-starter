@@ -1,6 +1,6 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
-import io.github.bitfist.jcef.spring.tsobject.TypeScriptDto;
+import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,20 +28,44 @@ class TypeScriptModelGenerator {
 	private final Elements elementUtils;
 
 	@Getter
-	private final Map<String, TypeScriptClass> classModel = new HashMap<>();
+	private final Map<String, TSClass> classModel = new HashMap<>();
 	private final Set<String> processedTypes = new HashSet<>();
 
-	void processDto(TypeElement typeElement) {
+	void processEnum(TypeElement typeElement) {
 		var qualifiedName = typeElement.getQualifiedName().toString();
 		if (processedTypes.contains(qualifiedName)) {
 			return;
 		}
 		processedTypes.add(qualifiedName);
 
-		var annotation = typeElement.getAnnotation(TypeScriptDto.class);
+		var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
+		var simpleName = typeElement.getSimpleName().toString();
+		var outputPath = packageName.replace('.', '/');
+
+		var tsClass = new TSClass(qualifiedName, simpleName, packageName, outputPath, TSClass.Type.ENUM);
+		classModel.put(qualifiedName, tsClass);
+
+		// Process enum constants
+		for (Element enclosedElement : typeElement.getEnclosedElements()) {
+			if (enclosedElement.getKind() == ElementKind.ENUM_CONSTANT) {
+				var enumConstant = enclosedElement.getSimpleName().toString();
+				// For enums, we use the field name as both name and type
+				tsClass.getFields().add(new Field(enumConstant, enumConstant, false));
+			}
+		}
+	}
+
+	void processClass(TypeElement typeElement) {
+		var qualifiedName = typeElement.getQualifiedName().toString();
+		if (processedTypes.contains(qualifiedName)) {
+			return;
+		}
+		processedTypes.add(qualifiedName);
+
+		var annotation = typeElement.getAnnotation(TypeScriptClass.class);
 		var customPath = annotation.path();
 
-		var tsClass = createTypeScriptClass(typeElement, customPath, TypeScriptClass.Type.DTO);
+		var tsClass = createTypeScriptClass(typeElement, customPath, TSClass.Type.CLASS);
 		classModel.put(qualifiedName, tsClass);
 
 		// Process fields
@@ -65,7 +89,7 @@ class TypeScriptModelGenerator {
 		var annotation = typeElement.getAnnotation(TypeScriptService.class);
 		var customPath = annotation.path();
 
-		var tsClass = createTypeScriptClass(typeElement, customPath, TypeScriptClass.Type.SERVICE);
+		var tsClass = createTypeScriptClass(typeElement, customPath, TSClass.Type.SERVICE);
 		classModel.put(qualifiedName, tsClass);
 
 		// Process methods
@@ -79,7 +103,7 @@ class TypeScriptModelGenerator {
 		}
 	}
 
-	private TypeScriptClass createTypeScriptClass(TypeElement typeElement, String customPath, TypeScriptClass.Type type) {
+	private TSClass createTypeScriptClass(TypeElement typeElement, String customPath, TSClass.Type type) {
 		var qualifiedName = typeElement.getQualifiedName().toString();
 		var simpleName = typeElement.getSimpleName().toString();
 		var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
@@ -91,10 +115,10 @@ class TypeScriptModelGenerator {
 			outputPath = packageName.replace('.', '/');
 		}
 
-		return new TypeScriptClass(qualifiedName, simpleName, packageName, outputPath, type);
+		return new TSClass(qualifiedName, simpleName, packageName, outputPath, type);
 	}
 
-	private void processField(VariableElement field, TypeScriptClass tsClass) {
+	private void processField(VariableElement field, TSClass tsClass) {
 		var fieldName = field.getSimpleName().toString();
 		var fieldType = field.asType();
 
@@ -104,10 +128,10 @@ class TypeScriptModelGenerator {
 		tsClass.getFields().add(new Field(fieldName, tsType, isOptional));
 
 		// Check if we need to generate DTO for this type
-		checkAndAddDtoForType(fieldType);
+		checkAndAddClassForType(fieldType);
 	}
 
-	private void processMethod(ExecutableElement method, TypeScriptClass tsClass) {
+	private void processMethod(ExecutableElement method, TSClass tsClass) {
 		var methodName = method.getSimpleName().toString();
 		var returnType = method.getReturnType();
 
@@ -120,16 +144,16 @@ class TypeScriptModelGenerator {
 			parameters.add(new Parameter(paramName, paramType));
 
 			// Check if we need to generate DTO for parameter type
-			checkAndAddDtoForType(param.asType());
+			checkAndAddClassForType(param.asType());
 		}
 
 		// Check if we need to generate DTO for return type
-		checkAndAddDtoForType(returnType);
+		checkAndAddClassForType(returnType);
 
 		tsClass.getMethods().add(new Method(methodName, tsReturnType, parameters));
 	}
 
-	private void checkAndAddDtoForType(TypeMirror type) {
+	private void checkAndAddClassForType(TypeMirror type) {
 		if (type.getKind() == TypeKind.DECLARED) {
 			var declaredType = (DeclaredType) type;
 			var typeElement = (TypeElement) declaredType.asElement();
@@ -137,22 +161,25 @@ class TypeScriptModelGenerator {
 
 			// Skip java.lang types and already processed types
 			if (!qualifiedName.startsWith("java.lang.") && !processedTypes.contains(qualifiedName)) {
-				processedTypes.add(qualifiedName);
+				// Create class for this type
+				if (typeElement.getKind() == ElementKind.ENUM) {
+					processEnum(typeElement);
+				} else {
+					processedTypes.add(qualifiedName);
+					var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
+					var simpleName = typeElement.getSimpleName().toString();
+					var outputPath = packageName.replace('.', '/');
 
-				// Create DTO for this type
-				var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
-				var simpleName = typeElement.getSimpleName().toString();
-				var outputPath = packageName.replace('.', '/');
+					var tsClass = new TSClass(qualifiedName, simpleName, packageName, outputPath, TSClass.Type.CLASS);
+					classModel.put(qualifiedName, tsClass);
 
-				var tsClass = new TypeScriptClass(qualifiedName, simpleName, packageName, outputPath, TypeScriptClass.Type.DTO);
-				classModel.put(qualifiedName, tsClass);
-
-				// Process fields of this type
-				for (Element enclosedElement : typeElement.getEnclosedElements()) {
-					if (enclosedElement.getKind() == ElementKind.FIELD) {
-						var field = (VariableElement) enclosedElement;
-						if (!field.getModifiers().contains(Modifier.STATIC) && !field.getModifiers().contains(Modifier.TRANSIENT)) {
-							processField(field, tsClass);
+					// Process fields of this type
+					for (Element enclosedElement : typeElement.getEnclosedElements()) {
+						if (enclosedElement.getKind() == ElementKind.FIELD) {
+							var field = (VariableElement) enclosedElement;
+							if (!field.getModifiers().contains(Modifier.STATIC) && !field.getModifiers().contains(Modifier.TRANSIENT)) {
+								processField(field, tsClass);
+							}
 						}
 					}
 				}
@@ -160,7 +187,7 @@ class TypeScriptModelGenerator {
 
 			// Process generic type arguments
 			for (TypeMirror typeArg : declaredType.getTypeArguments()) {
-				checkAndAddDtoForType(typeArg);
+				checkAndAddClassForType(typeArg);
 			}
 		}
 	}
@@ -182,6 +209,10 @@ class TypeScriptModelGenerator {
 				var declaredType = (DeclaredType) type;
 				var typeElement = (TypeElement) declaredType.asElement();
 				var typeName = typeElement.getQualifiedName().toString();
+
+				if (typeElement.getKind() == ElementKind.ENUM) {
+					return typeElement.getSimpleName().toString();
+				}
 
 				// Handle common Java types
 				if (typeName.equals("java.lang.String")) {
