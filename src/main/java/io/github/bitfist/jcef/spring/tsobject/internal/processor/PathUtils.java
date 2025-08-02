@@ -1,7 +1,5 @@
 package io.github.bitfist.jcef.spring.tsobject.internal.processor;
 
-import java.nio.file.Paths;
-
 /**
  * Utility class for file path manipulations.
  */
@@ -10,26 +8,39 @@ final class PathUtils {
 	private PathUtils() {
 	}
 
-	/**
-	 * Calculates the relative path to import from a target package to a source package.
-	 *
-	 * @param fromPath The path of the file needing the import (e.g., "com/app/ui").
-	 * @param toPath   The path of the file to be imported (e.g., "com/app/core").
-	 * @return The relative path string (e.g., "../core").
-	 */
-	public static String getRelativePath(String fromPath, String toPath) {
-		if (fromPath.equals(toPath)) {
-			return ".";
+	static String calculateRelativePath(String fromPath, String toPath, String fileName) {
+		var fromParts = fromPath.split("/");
+		var toParts = toPath.split("/");
+
+		// Find common prefix
+		var commonLength = 0;
+		for (var i = 0; i < Math.min(fromParts.length, toParts.length); i++) {
+			if (fromParts[i].equals(toParts[i])) {
+				commonLength++;
+			} else {
+				break;
+			}
 		}
 
-		var relativePath = Paths.get(fromPath).relativize(Paths.get(toPath));
-		var result = relativePath.toString().replace('\\', '/');
+		// Build relative path
+		var path = new StringBuilder();
 
-		// If the path does not start with a '.', it's a subfolder, so prepend './'
-		if (!result.startsWith(".") && !result.startsWith("/")) {
-			return "./" + result;
+		// Go up from source
+		path.append("../".repeat(Math.max(0, fromParts.length - commonLength)));
+
+		// Go down to target
+		for (var i = commonLength; i < toParts.length; i++) {
+			path.append(toParts[i]).append("/");
 		}
 
-		return result;
+		// Add filename
+		path.append(fileName);
+
+		// If in same directory, use ./
+		if (path.length() == fileName.length()) {
+			return "./" + fileName;
+		}
+
+		return path.toString();
 	}
 }

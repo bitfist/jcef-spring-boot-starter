@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContext;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-class TypeScriptObjectAutoConfigurationTest {
+class TypeScriptServiceAutoConfigurationTest {
 
 	private final ApplicationContext applicationContext = mock(ApplicationContext.class);
 

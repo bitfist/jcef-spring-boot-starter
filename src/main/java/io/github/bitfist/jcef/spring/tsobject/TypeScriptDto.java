@@ -6,11 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Lets the user configure JavaScript generation.
+ * Marks a class for TypeScript generation.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface TypeScriptConfiguration {
+@Target(ElementType.TYPE)
+public @interface TypeScriptDto {
 
 	String path() default "";
 }
