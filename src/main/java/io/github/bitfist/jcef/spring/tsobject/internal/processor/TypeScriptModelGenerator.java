@@ -4,6 +4,7 @@ import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 import io.github.bitfist.jcef.spring.tsobject.TypeScriptService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -38,18 +39,17 @@ class TypeScriptModelGenerator {
 		}
 		processedTypes.add(qualifiedName);
 
+		var customPath = getCustomPath(typeElement);
 		var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
 		var simpleName = typeElement.getSimpleName().toString();
-		var outputPath = packageName.replace('.', '/');
+		var outputPath = customPath == null || customPath.isBlank() ? packageName.replace('.', '/') : customPath;
 
 		var tsClass = new TSClass(qualifiedName, simpleName, packageName, outputPath, TSClass.Type.ENUM);
 		classModel.put(qualifiedName, tsClass);
 
-		// Process enum constants
 		for (Element enclosedElement : typeElement.getEnclosedElements()) {
 			if (enclosedElement.getKind() == ElementKind.ENUM_CONSTANT) {
 				var enumConstant = enclosedElement.getSimpleName().toString();
-				// For enums, we use the field name as both name and type
 				tsClass.getFields().add(new Field(enumConstant, enumConstant, false));
 			}
 		}
@@ -62,9 +62,7 @@ class TypeScriptModelGenerator {
 		}
 		processedTypes.add(qualifiedName);
 
-		var annotation = typeElement.getAnnotation(TypeScriptClass.class);
-		var customPath = annotation.path();
-
+		var customPath = getCustomPath(typeElement);
 		var tsClass = createTypeScriptClass(typeElement, customPath, TSClass.Type.CLASS);
 		classModel.put(qualifiedName, tsClass);
 
@@ -77,6 +75,11 @@ class TypeScriptModelGenerator {
 				}
 			}
 		}
+	}
+
+	private static @Nullable String getCustomPath(TypeElement typeElement) {
+		var annotation = typeElement.getAnnotation(TypeScriptClass.class);
+		return annotation == null ? null : annotation.path();
 	}
 
 	void processService(TypeElement typeElement) {
@@ -103,13 +106,13 @@ class TypeScriptModelGenerator {
 		}
 	}
 
-	private TSClass createTypeScriptClass(TypeElement typeElement, String customPath, TSClass.Type type) {
+	private TSClass createTypeScriptClass(TypeElement typeElement, @Nullable String customPath, TSClass.Type type) {
 		var qualifiedName = typeElement.getQualifiedName().toString();
 		var simpleName = typeElement.getSimpleName().toString();
 		var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
 
 		String outputPath;
-		if (!customPath.isEmpty()) {
+		if (customPath != null && !customPath.isEmpty()) {
 			outputPath = customPath;
 		} else {
 			outputPath = packageName.replace('.', '/');
@@ -160,28 +163,11 @@ class TypeScriptModelGenerator {
 			var qualifiedName = typeElement.getQualifiedName().toString();
 
 			// Skip java.lang types and already processed types
-			if (!qualifiedName.startsWith("java.lang.") && !processedTypes.contains(qualifiedName)) {
-				// Create class for this type
+			if (!qualifiedName.startsWith("java.lang.")) {
 				if (typeElement.getKind() == ElementKind.ENUM) {
 					processEnum(typeElement);
-				} else {
-					processedTypes.add(qualifiedName);
-					var packageName = elementUtils.getPackageOf(typeElement).getQualifiedName().toString();
-					var simpleName = typeElement.getSimpleName().toString();
-					var outputPath = packageName.replace('.', '/');
-
-					var tsClass = new TSClass(qualifiedName, simpleName, packageName, outputPath, TSClass.Type.CLASS);
-					classModel.put(qualifiedName, tsClass);
-
-					// Process fields of this type
-					for (Element enclosedElement : typeElement.getEnclosedElements()) {
-						if (enclosedElement.getKind() == ElementKind.FIELD) {
-							var field = (VariableElement) enclosedElement;
-							if (!field.getModifiers().contains(Modifier.STATIC) && !field.getModifiers().contains(Modifier.TRANSIENT)) {
-								processField(field, tsClass);
-							}
-						}
-					}
+				} else if (typeElement.getKind() == ElementKind.CLASS) {
+					processClass(typeElement);
 				}
 			}
 

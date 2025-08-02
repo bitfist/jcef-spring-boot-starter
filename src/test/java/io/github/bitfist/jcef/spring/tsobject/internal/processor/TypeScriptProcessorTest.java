@@ -57,7 +57,10 @@ class TypeScriptProcessorTest {
 			// language=java
 			"""
 			package test;
+
+			import io.github.bitfist.jcef.spring.tsobject.TypeScriptClass;
 			
+			@TypeScriptClass(path = "custom/path")
 			enum TestEnum {
 				Linz, Wels, Steyr
 			}
@@ -104,7 +107,7 @@ class TypeScriptProcessorTest {
 			// Check that expected TypeScript files exist on disk
 			var dtoTs = tmpDir.resolve("custom").resolve("path").resolve("ExampleDto.ts");
 			var dto2Ts = tmpDir.resolve("test").resolve("ExampleDto2.ts");
-			var enumTs = tmpDir.resolve("test").resolve("TestEnum.ts");
+			var enumTs = tmpDir.resolve("custom").resolve("path").resolve("TestEnum.ts");
 			var serviceTs = tmpDir.resolve("test").resolve("ExampleService.ts");
 
 			assertTrue(Files.exists(dtoTs), "DTO TypeScript file should be generated: " + dtoTs);
