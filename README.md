@@ -45,7 +45,6 @@ Example `application.yml`:
 
 ```yaml
 jcef:
-  application-name: my-app
   splash-screen-classpath-resource: splash.png
   distribution-classpath: ui # classpath to UI files
   development:
@@ -64,7 +63,7 @@ jcef:
 ```java
 public class MyApp {
     public static void main(String[] args) {
-        JcefApplication.run(MyApp.class, args);
+        JcefApplication.run(MyApp.class, "your-application-name", args);
     }
 }
 ```
@@ -81,8 +80,7 @@ public interface MyScripts {
 ### 🎨 Marking Beans for TypeScript Generation
 
 ```java
-@TypeScriptConfiguration(path = "app")
-@TypeScriptObject
+@TypeScriptService
 public class MyCallback {
     public String echo(String message) {
         return message;
@@ -132,5 +130,5 @@ Autoconfiguration for debugging features:
 
 ### 🎨 TypeScript Object
 
-- **@TypeScriptConfiguration** 🎨 Configure TypeScript output path for generated files.
-- **@TypeScriptObject** 🎨 Mark Spring beans as callbacks accessible from JavaScript; triggers TS code generation.
+- **@TypeScriptClass** 🎨 Exposes a class as TypeScript class containing all members.
+- **@TypeScriptService** 🎨 Exposes a class as TypeScript service containing all non-private non-static methods.
