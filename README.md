@@ -97,12 +97,13 @@ All packages under `src/main/java/io/github/bitfist/jcef/spring/` are public API
 ### ⚙️ Application
 
 - **JcefApplication**
-  - `run(Class<T>, String[])`
-  - `run(Class<T>, String[], Consumer<SpringApplicationBuilder>)`
+  - `run(Class<T>, String, String[])`
+  - `run(Class<T>, String, String[], Consumer<SpringApplicationBuilder>)`
 - **JcefApplicationProperties**  
   Binds `jcef.*` properties, validates configuration, and provides:
   - Platform-specific installation paths (`getInstallationPath()`)
   - JCEF bundle path (`getJcefInstallationPath()`)
+  - JCEF data path (`getJcefDataPath()`)
   - UI resources path (`getUiInstallationPath()`)
 
 ### 🖥 Browser
