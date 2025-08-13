@@ -21,7 +21,7 @@ springBootConfigurationProcessor = { module = "org.springframework.boot:spring-b
 # endregion
 
 # region OpenRewrite
-openRewriteMigrateJava = { module = "org.openrewrite.recipe:rewrite-migrate-java", version = "3.14.1" }
+openRewriteMigrateJava = { module = "org.openrewrite.recipe:rewrite-migrate-java", version = "3.15.0" }
 # endregion
 
 # region Tests
