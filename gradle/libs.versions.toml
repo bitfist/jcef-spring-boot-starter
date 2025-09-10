@@ -26,5 +26,5 @@ openRewriteMigrateJava = { module = "org.openrewrite.recipe:rewrite-migrate-java
 
 # region Tests
 compileTesting = { module = "com.google.testing.compile:compile-testing", version = "0.21.0" }
-googleTruth    = { module = "com.google.truth:truth",                     version = "1.4.4"  }
+googleTruth    = { module = "com.google.truth:truth",                     version = "1.4.5"  }
 # endregion
