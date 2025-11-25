@@ -12,7 +12,7 @@ springBootBom     = { module = "org.springframework.boot:spring-boot-dependencie
 springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom",  version     = "2.0.0"      }
 # endregion
 
-jcef     = { module = "me.friwi:jcefmaven",    version = "135.0.20" }
+jcef     = { module = "me.friwi:jcefmaven",    version = "141.0.10" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0"    }
 
 # region Annotation processors
