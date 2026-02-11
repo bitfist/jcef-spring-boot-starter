@@ -4,7 +4,7 @@ springBoot     = "4.0.2"
 [plugins]
 lombok               = { id = "io.freefair.lombok",              version = "9.2.0"   }
 dependencyManagement = { id = "io.spring.dependency-management", version = "1.1.7"  }
-openRewrite          = { id = "org.openrewrite.rewrite",         version = "7.25.0" }
+openRewrite          = { id = "org.openrewrite.rewrite",         version = "7.26.0" }
 
 [libraries]
 # region BOMs
