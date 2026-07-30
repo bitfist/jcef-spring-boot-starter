@@ -13,7 +13,7 @@ springModulithBom = { module = "org.springframework.modulith:spring-modulith-bom
 # endregion
 
 jcef     = { module = "me.friwi:jcefmaven",    version = "146.0.10" }
-jspecify = { module = "org.jspecify:jspecify", version = "1.0.0"    }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.1"    }
 
 # region Annotation processors
 springBootAutoconfigureProcessor = { module = "org.springframework.boot:spring-boot-autoconfigure-processor", version.ref = "springBoot" }
